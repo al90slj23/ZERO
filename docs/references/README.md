@@ -25,6 +25,15 @@
 
 ---
 
+## 布局与架构
+
+| 文档 | 说明 |
+|------|------|
+| [admin-layout.md](admin-layout.md) | 管理后台 ABCD 布局 |
+| [vanilla-spa.md](vanilla-spa.md) | 原生 SPA 实现参考 |
+
+---
+
 ## 页面模板
 
 | 文档 | 说明 |
