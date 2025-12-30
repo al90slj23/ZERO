@@ -169,3 +169,27 @@ confirm() {
         * ) return 1;;
     esac
 }
+
+# ============================================================
+# 部署排除规则
+# ============================================================
+
+DEPLOY_IGNORE=".deployignore"
+
+# 构建 rsync 排除参数
+build_rsync_excludes() {
+    local excludes=""
+    if [ -f "$DEPLOY_IGNORE" ]; then
+        while IFS= read -r line || [ -n "$line" ]; do
+            # 跳过空行和注释
+            [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+            # 去除首尾空格
+            line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            [ -n "$line" ] && excludes="$excludes --exclude='$line'"
+        done < "$DEPLOY_IGNORE"
+    fi
+    echo "$excludes"
+}
+
+# 预构建排除参数
+RSYNC_EXCLUDES=$(build_rsync_excludes)

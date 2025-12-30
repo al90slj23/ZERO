@@ -41,6 +41,7 @@ Zero/
 ├── go.2.sh                             # 选项 2: 部署
 ├── go.3.sh                             # 选项 3: 清缓存
 └── docs/
+    ├── ZERO-ITERATION.md              # ZERO 框架迭代流程（元文档）
     ├── standards/                      # 完整版规范
     │   ├── 00.meta-01.core.md         # 元规范
     │   ├── 01.arch-01.core.md         # 核心架构原则
@@ -56,7 +57,8 @@ Zero/
     │   ├── 06.quality-02.git.md       # Git提交规范
     │   ├── 06.quality-03.error.md     # 错误处理规范
     │   ├── 06.quality-04.header.md    # 文件头注释规范
-    │   └── 09.tool-01.gosh.md         # go.sh 脚本规范
+    │   ├── 09.tool-01.gosh.md         # go.sh 脚本规范
+    │   └── 09.tool-02.deployignore.md # 部署排除规则规范
     └── condensed/                      # 精炼版规范（100-150行/文件）
         └── ...
 ```

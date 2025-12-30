@@ -9,9 +9,14 @@
 # 将项目部署到远程服务器
 #
 # 【部署步骤】
-# 1. 构建生产版本
-# 2. 同步文件到服务器
-# 3. 执行远程命令（清缓存、重启服务等）
+# 1. 读取 .deployignore 排除规则
+# 2. 同步文件到服务器（rsync）
+# 3. 修复文件权限
+# 4. 验证部署结果
+#
+# 【依赖文件】
+# - .deployignore: 部署排除规则配置
+# - go.lib.sh: 通用库（包含 RSYNC_EXCLUDES）
 #
 # ================================================================
 
@@ -25,24 +30,19 @@ step "部署到服务器"
 REMOTE_USER="your_user"
 REMOTE_HOST="your_server.com"
 REMOTE_PATH="/var/www/your_project"
+SITE_URL="https://your_domain.com"
 
 # SSH 配置（可选）
-SSH_KEY="~/.ssh/id_rsa"
+# SSH_KEY="~/.ssh/id_rsa"
 
 # ============================================================
-# 1. 构建生产版本
+# 1. 检查 .deployignore
 # ============================================================
 
-step "构建生产版本..."
-
-# 示例：Node.js 项目
-# npm run build
-
-# 示例：检查构建结果
-# if [ ! -d "dist" ] && [ ! -d "build" ]; then
-#     error "构建失败，找不到输出目录"
-#     exit 1
-# fi
+if [ ! -f ".deployignore" ]; then
+    warn "未找到 .deployignore 文件，将同步所有文件"
+    warn "建议创建 .deployignore 配置部署排除规则"
+fi
 
 # ============================================================
 # 2. 同步文件到服务器
@@ -50,41 +50,56 @@ step "构建生产版本..."
 
 step "同步文件到服务器..."
 
-# 示例：使用 rsync 同步
-# rsync -avz --delete \
-#     --exclude 'node_modules' \
-#     --exclude '.git' \
-#     --exclude '.env' \
-#     -e "ssh -i $SSH_KEY" \
-#     ./ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
+# 使用 go.lib.sh 中预构建的 RSYNC_EXCLUDES
+eval "rsync -avz --delete --no-owner --no-group --no-perms $RSYNC_EXCLUDES ./ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/"
+
+if [ $? -ne 0 ]; then
+    error "文件同步失败"
+    exit 1
+fi
+success "文件同步完成"
 
 # ============================================================
-# 3. 执行远程命令
+# 3. 修复文件权限
 # ============================================================
 
-step "执行远程命令..."
+step "修复文件权限..."
 
-# 示例：清除缓存、重启服务
-# ssh -i $SSH_KEY ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
-#     cd /var/www/your_project
-#     
-#     # Node.js 项目
-#     npm install --production
-#     pm2 restart all
-#     
-#     # PHP Laravel 项目
-#     # composer install --no-dev
-#     # php artisan config:cache
-#     # php artisan route:cache
-#     # php artisan view:cache
-# EOF
+ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${REMOTE_PATH} && \
+    find . -type d -exec chmod 755 {} \; 2>/dev/null; \
+    find . -type f -exec chmod 644 {} \; 2>/dev/null; \
+    find . -name '*.sh' -exec chmod 755 {} \; 2>/dev/null"
+
+if [ $? -ne 0 ]; then
+    warn "权限修复可能未完全成功"
+else
+    success "权限修复完成"
+fi
 
 # ============================================================
-# 占位：请根据项目实际情况修改上述内容
+# 4. 验证部署
 # ============================================================
 
-info "请根据项目实际情况修改 go.2.sh"
-info "示例命令已注释，取消注释并调整即可使用"
+step "验证部署..."
+
+# 检查网站响应（根据实际情况调整 URL）
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${SITE_URL}" --max-time 10 2>/dev/null)
+
+if [ "$HTTP_CODE" == "000" ]; then
+    warn "无法连接到 ${SITE_URL}，请手动验证"
+elif [ "$HTTP_CODE" == "403" ]; then
+    error "网站返回 403，权限可能有问题"
+    exit 1
+elif [ "$HTTP_CODE" == "200" ] || [ "$HTTP_CODE" == "301" ] || [ "$HTTP_CODE" == "302" ]; then
+    success "网站响应正常 (HTTP ${HTTP_CODE})"
+else
+    warn "网站返回 HTTP ${HTTP_CODE}，请检查"
+fi
+
+# ============================================================
+# 完成
+# ============================================================
 
 echo ""
-success "部署配置完成"
+success "部署完成！"
+info "访问地址: ${SITE_URL}"
