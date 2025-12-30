@@ -654,6 +654,69 @@ if (typeof lucide !== 'undefined') {
 
 **解决**：添加 `setupPopState()` 监听
 
+### 6. Cloudflare Rocket Loader 干扰脚本执行
+
+**原因**：Cloudflare 的 Rocket Loader 会拦截并延迟执行 `<head>` 中的脚本
+
+**解决**：将动态脚本添加到 `document.body` 而非 `document.head`
+
+```javascript
+function executeScripts(container) {
+    const scripts = Array.from(container.querySelectorAll('script'));
+    
+    // 分离外部脚本和内联脚本
+    const externalScripts = scripts.filter(s => s.src);
+    const inlineScripts = scripts.filter(s => !s.src);
+    
+    // 移除原始脚本标签
+    scripts.forEach(s => s.remove());
+    
+    // 加载外部脚本（按顺序）
+    let loadPromise = Promise.resolve();
+    
+    externalScripts.forEach(oldScript => {
+        loadPromise = loadPromise.then(() => {
+            return new Promise((resolve) => {
+                const newScript = document.createElement('script');
+                newScript.src = oldScript.src;
+                newScript.onload = resolve;
+                newScript.onerror = () => {
+                    console.error('脚本加载失败:', oldScript.src);
+                    resolve(); // 继续执行，不阻塞
+                };
+                // 🔑 使用 body 而非 head，避免 Cloudflare Rocket Loader 干扰
+                document.body.appendChild(newScript);
+            });
+        });
+    });
+    
+    // 外部脚本加载完成后执行内联脚本
+    loadPromise.then(() => {
+        inlineScripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            newScript.textContent = oldScript.textContent;
+            document.body.appendChild(newScript);
+        });
+    });
+}
+```
+
+### 7. CDN 缓存导致 JS 更新不生效
+
+**原因**：Cloudflare 等 CDN 会缓存静态资源
+
+**解决**：在 `content.html` 中给 JS/CSS 文件添加版本号
+
+```html
+<!-- ❌ 错误：可能被缓存 -->
+<script src="/admin/users.js"></script>
+
+<!-- ✅ 正确：添加版本号强制刷新 -->
+<script src="/admin/users.js?v=2"></script>
+```
+
+**最佳实践**：每次修改 JS/CSS 文件后，更新版本号
+
 ---
 
 ## 🔗 与框架版本的对比

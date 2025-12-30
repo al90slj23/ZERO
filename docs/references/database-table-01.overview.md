@@ -146,8 +146,20 @@ CREATE TABLE `users` (
 
 ---
 
-## 6. 相关文档
+## 6. 技术栈版本
 
+组件提供两个版本，根据项目技术栈选择：
+
+| 版本 | 适用场景 | 文档 |
+|------|----------|------|
+| **Vue 版本** | Vue 3 + TypeScript 项目 | 本系列文档 02-08 |
+| **Vanilla JS 版本** | 纯 HTML/CSS/JS 项目 | [database-table-09.vanilla-js.md](database-table-09.vanilla-js.md) |
+
+---
+
+## 7. 相关文档
+
+### Vue 版本文档
 - [database-table-02.props-api.md](database-table-02.props-api.md) - Props 与 API
 - [database-table-03.column-header.md](database-table-03.column-header.md) - 列头规范
 - [database-table-04.table-interaction.md](database-table-04.table-interaction.md) - 表格交互
@@ -155,6 +167,9 @@ CREATE TABLE `users` (
 - [database-table-06.cell-edit.md](database-table-06.cell-edit.md) - 单元格编辑
 - [database-table-07.field-settings.md](database-table-07.field-settings.md) - 字段设置
 - [database-table-08.history.md](database-table-08.history.md) - 操作历史
+
+### Vanilla JS 版本文档
+- [database-table-09.vanilla-js.md](database-table-09.vanilla-js.md) - Vanilla JS 实现
 
 ---
 
