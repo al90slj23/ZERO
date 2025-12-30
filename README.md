@@ -42,7 +42,8 @@ Zero/
 ├── go.3.sh                             # 选项 3: 清缓存
 └── docs/
     ├── ZERO-ITERATION.md              # ZERO 框架迭代流程（元文档）
-    ├── standards/                      # 完整版规范
+    │
+    ├── standards/                      # 框架基础规范
     │   ├── 00.meta-01.core.md         # 元规范
     │   ├── 01.arch-01.core.md         # 核心架构原则
     │   ├── 01.arch-02.structure.md    # 路径映射规范
@@ -59,6 +60,14 @@ Zero/
     │   ├── 06.quality-04.header.md    # 文件头注释规范
     │   ├── 09.tool-01.gosh.md         # go.sh 脚本规范
     │   └── 09.tool-02.deployignore.md # 部署排除规则规范
+    │
+    ├── references/                     # 组件/功能参考（具体实现）
+    │   ├── README.md                  # 参考文档索引
+    │   ├── admin-layout.md            # 管理后台 ABCD 布局
+    │   ├── vanilla-spa.md             # 原生 SPA 实现参考
+    │   ├── database-table-*.md        # 通用表格组件（8个文件）
+    │   └── manifest-admin.md          # Manifest 管理页面
+    │
     └── condensed/                      # 精炼版规范（100-150行/文件）
         └── ...
 ```
@@ -352,4 +361,4 @@ const name = config?.shortName || folderName
 
 ---
 
-**最后更新**：2025-12-30
+**最后更新**：2025-12-31
