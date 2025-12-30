@@ -38,7 +38,7 @@ check_project_root
 
 # 显示标题
 echo -e "${BLUE}================================${NC}"
-echo -e "${BLUE}    Zero 项目管理脚本${NC}"
+echo -e "${BLUE}    ZERO - PathKing${NC}"
 echo -e "${BLUE}================================${NC}"
 echo ""
 
