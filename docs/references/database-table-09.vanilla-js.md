@@ -143,17 +143,33 @@ if (typeof initUsers === 'function') {
 ```javascript
 {
     field: 'name',           // 字段名（必填）
-    label: '姓名',           // 列标题
+    label: '姓名',           // 列标题（从数据库注释第3段获取）
     type: 'text',            // 显示类型
     sortable: true,          // 是否可排序
-    hidden: false,           // 是否隐藏
+    hidden: false,           // 是否隐藏（通用表格组件始终为 false）
     editable: true,          // 是否可编辑
     required: false,         // 是否必填
     default: '',             // 默认值
-    help: '帮助文本',        // 问号提示
-    hint: '输入提示'         // 表单提示
+    hint: '输入提示',        // 表单输入提示（从数据库注释第4段获取）
+    // Tooltip 四段信息（自动从数据库获取）
+    tableName: 'users',      // 所属表名
+    tableComment: '用户表',  // 所属表的注释
+    fieldComment: '1|核心|姓名|用户的真实姓名|1'  // 字段的完整注释
 }
 ```
+
+**Tooltip 显示内容**：
+鼠标悬停表头问号图标时，显示四段信息：
+1. **表名**: 所属数据库表名
+2. **表注释**: 表的中文说明
+3. **字段名**: 数据库字段名
+4. **字段注释**: 字段的完整注释（格式：序号|分类|名称|说明|显示）
+
+**⚠️ 重要说明**：
+- 数据库字段注释格式为 `序号|分类|名称|说明|显示`
+- 注释中的第5段"显示"（0或1）用于**其他场景**（如前端表单显示控制），**不是**通用表格组件的列隐藏控制
+- **通用表格组件显示所有列**，`hidden` 属性始终为 `false`
+- 如需在特定页面隐藏某列，应在前端代码中手动配置 `columns`
 
 ### 5.2 显示类型 (type)
 
@@ -208,9 +224,157 @@ if (typeof initUsers === 'function') {
 
 ---
 
-## 6. API 规范
+## 6. 操作列
 
-### 6.1 请求格式
+### 6.1 按钮结构
+
+操作列位于表格最后一列，包含三个按钮：
+
+| 按钮 | 图标 | 样式 | 提示文字 |
+|------|------|------|----------|
+| 编辑 | `edit-2` | primary (红色) | "编辑" |
+| 复制 | `copy` | default (蓝色) | "复制" |
+| 删除 | `trash-2` | danger (红色) | "删除" |
+
+### 6.2 复制功能
+
+复制功能用于快速创建相似记录：
+
+```javascript
+// handleCopy 方法实现
+DbTable.prototype.handleCopy = function(row) {
+    // 1. 复制选中行的所有数据
+    var copyData = Object.assign({}, row);
+    
+    // 2. 删除不应复制的字段
+    delete copyData.id;           // 删除主键 ID
+    delete copyData.created_at;   // 删除创建时间
+    delete copyData.updated_at;   // 删除更新时间
+    delete copyData.deleted_at;   // 删除软删除时间
+    
+    // 3. 以"新建"模式打开表单，预填充复制的数据
+    this.openEditDialog(null, copyData);
+};
+```
+
+**复制操作流程**：
+1. 用户点击复制按钮
+2. `handleCopy(row)` 被调用
+3. 复制行数据，移除 id/created_at/updated_at/deleted_at
+4. `openEditDialog(null, copyData)` 以新建模式打开表单
+5. 表单预填充复制的数据（除了被删除的字段）
+6. 用户编辑后点击保存
+7. 调用 `create` action 创建新记录
+
+---
+
+## 7. 冻结列
+
+表格支持冻结列功能，确保关键列在水平滚动时始终可见。
+
+### 7.1 冻结策略
+
+| 冻结位置 | 列 | z-index | 说明 |
+|----------|-----|---------|------|
+| 表头行 | 所有列 | 20 | 垂直滚动时固定在顶部 |
+| 左上角 | 表头 ID 列 | 30 | 最高层级，始终可见 |
+| 右上角 | 表头操作列 | 30 | 最高层级，始终可见 |
+| 左侧 | ID 列（第一列） | 10 | 水平滚动时固定在左侧 |
+| 右侧 | 操作列（最后一列） | 10 | 水平滚动时固定在右侧 |
+
+### 7.2 CSS 实现
+
+```css
+/* 表格容器支持双向滚动 */
+.dbtable-wrapper {
+    overflow: auto;
+    max-height: 70vh;
+    position: relative;
+}
+
+/* 表头行冻结 */
+.dbtable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+/* ID 列（第一列）冻结 */
+.dbtable th:first-child,
+.dbtable td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    border-right: 1px solid var(--border-color, #333);
+}
+
+/* 表头 ID 列（左上角）z-index 最高 */
+.dbtable thead th:first-child {
+    z-index: 30;
+}
+
+/* 操作列（最后一列）冻结 */
+.dbtable th:last-child,
+.dbtable td:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 10;
+    border-left: 1px solid var(--border-color, #333);
+}
+
+/* 表头操作列（右上角）z-index 最高 */
+.dbtable thead th:last-child {
+    z-index: 30;
+}
+```
+
+### 7.3 背景色处理
+
+冻结列需要设置实色背景，避免滚动时内容透视：
+
+```css
+/* 数据行冻结列背景 */
+.dbtable tbody tr td:first-child,
+.dbtable tbody tr td:last-child {
+    background: var(--card-bg, #1a1a2e);
+}
+
+/* hover 时使用实色背景 */
+.dbtable tbody tr:hover td:first-child,
+.dbtable tbody tr:hover td:last-child {
+    background: var(--hover-bg-solid, #252538);
+}
+
+/* 选中行冻结列背景 */
+.dbtable tbody tr.selected td:first-child,
+.dbtable tbody tr.selected td:last-child {
+    background: var(--selected-bg-solid, #2a1a1e);
+}
+```
+
+### 7.4 排序图标样式
+
+```css
+/* 排序图标优化 */
+.dbtable th .sort-icon {
+    margin-left: 4px;
+    opacity: 0.4;
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+}
+
+.dbtable th.sorted .sort-icon {
+    opacity: 1;
+    color: var(--primary-color, #E50914);
+}
+```
+
+---
+
+## 8. API 规范
+
+### 7.1 请求格式
 
 所有请求使用 POST + JSON：
 
@@ -226,7 +390,7 @@ if (typeof initUsers === 'function') {
 }
 ```
 
-### 6.2 响应格式
+### 7.2 响应格式
 
 ```javascript
 // 列表响应
@@ -253,7 +417,7 @@ if (typeof initUsers === 'function') {
 }
 ```
 
-### 6.3 Action 列表
+### 7.3 Action 列表
 
 | Action | 说明 | 参数 |
 |--------|------|------|
@@ -264,7 +428,7 @@ if (typeof initUsers === 'function') {
 
 ---
 
-## 7. PHP API 模板
+## 9. PHP API 模板
 
 ```php
 <?php
@@ -357,9 +521,9 @@ function handleList($input) {
 
 ---
 
-## 8. 常见问题
+## 10. 常见问题
 
-### 8.1 Token 未传递
+### 10.1 Token 未传递
 
 **问题**：API 返回 401 未授权
 
@@ -379,7 +543,7 @@ new DbTable({
 });
 ```
 
-### 8.2 CDN 缓存导致更新不生效
+### 10.2 CDN 缓存导致更新不生效
 
 **问题**：修改 JS 文件后，页面仍显示旧版本
 
@@ -388,7 +552,7 @@ new DbTable({
 <script src="/admin/dbtable.js?v=2"></script>
 ```
 
-### 8.3 变量重复声明错误
+### 10.3 变量重复声明错误
 
 **问题**：SPA 模式下报错 "Identifier has already been declared"
 
@@ -401,7 +565,7 @@ const API_URL = '/api/users';
 var API_URL = '/api/users';
 ```
 
-### 8.4 PHP API 输出两个 JSON
+### 10.4 PHP API 输出两个 JSON
 
 **问题**：前端 JSON.parse() 失败
 
@@ -411,7 +575,7 @@ var API_URL = '/api/users';
 
 ---
 
-## 9. 方法列表
+## 11. 方法列表
 
 | 方法 | 说明 | 参数 |
 |------|------|------|
@@ -422,9 +586,9 @@ var API_URL = '/api/users';
 
 ---
 
-## 10. 样式定制
+## 12. 样式定制
 
-### 10.1 CSS 变量
+### 12.1 CSS 变量
 
 ```css
 :root {
@@ -437,7 +601,7 @@ var API_URL = '/api/users';
 }
 ```
 
-### 10.2 状态颜色
+### 12.2 状态颜色
 
 ```css
 .status-dot.active { background: #52c41a; }
