@@ -28,6 +28,15 @@ API路径：/api/admin/users/config/levels
 2. **Code > documentation** - 代码胜过文档
 3. **Simple binary > complex hierarchy** - 简单二元规则胜过复杂多级优先级
 
+### 命名哲学（AI 开发友好）
+
+1. **完整描述 > 缩写简写** - `authentication.api.php` 而非 `auth.cmd.php`
+2. **AI 友好 > 人类打字方便** - 命名可以长，但必须精准
+3. **行业通用 > 项目特定** - 使用行业公认术语，避免自创缩写
+4. **精准语义 > 模糊简称** - `processUserRegistration()` 而非 `process()`
+
+详见：[04.quality-00.naming-philosophy.md](docs/standards/04.quality-00.naming-philosophy.md)
+
 ---
 
 ## 📁 文档结构
@@ -52,6 +61,7 @@ Zero/
     │   ├── 02.backend-03.db-fields.md # 数据库字段规范
     │   ├── 02.backend-04.db-manifest.md # 页面清单表规范
     │   ├── 03.frontend-01.structure.md # 文件命名规范
+    │   ├── 04.quality-00.naming-philosophy.md # 命名哲学（AI友好）⭐新增
     │   ├── 04.quality-01.naming.md    # 命名规范
     │   ├── 05.biz-01.menu.md          # 侧边栏菜单规范
     │   ├── 06.quality-01.size.md      # 文件大小与拆分规范
