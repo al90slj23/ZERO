@@ -53,6 +53,11 @@ Zero/
 └── docs/
     ├── ZERO-ITERATION.md              # ZERO 框架迭代流程（元文档）
     │
+    ├── inspirations/                   # 灵感来源库 ⭐新增
+    │   ├── README.md                  # 灵感来源库说明
+    │   └── ECC/                       # Everything Claude Code
+    │       └── ZERO-REFERENCE-GUIDE.md  # ECC 参考指南
+    │
     ├── standards/                      # 框架基础规范
     │   ├── 00.meta-01.core.md         # 元规范
     │   ├── 01.arch-01.core.md         # 核心架构原则
@@ -72,7 +77,7 @@ Zero/
     │   ├── 09.tool-01.gosh.md         # go.sh 脚本规范
     │   └── 09.tool-02.deployignore.md # 部署排除规则规范
     │
-    ├── references/                     # 组件/功能参考（具体实现）
+    ├── references/         # 组件/功能参考（具体实现）
     │   ├── README.md                  # 参考文档索引
     │   ├── admin-layout.md            # 管理后台 ABCD 布局
     │   ├── vanilla-spa.md             # 原生 SPA 实现参考
