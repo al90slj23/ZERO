@@ -103,26 +103,53 @@ Zero/
 
 ## 🗄️ 数据库规范
 
-### 页面清单表（核心）
+### 页面清单表（核心表）⭐
 
 **表名**：`{系统前缀}_manifest_list`
+
+**架构地位**：
+- **ZERO 框架的核心表**：所有应用 ZERO 的项目都应该有这张表
+- **单一数据源（Single Source of Truth）**：路由、菜单、权限的唯一配置来源
+- **不仅限于 admin**：适用于所有需要路径管理的场景
+- **坚固的路径基地**：为整个应用提供一致的路径映射和配置管理
 
 这是"路径为王"架构的核心表，存储所有页面/功能模块的配置信息：
 
 | 核心字段 | 说明 |
 |---------|------|
 | `path` | 文件夹路径（唯一主体） |
-| `url` | 访问URL |
-| `route` | 路由名称 |
-| `shortName` | 菜单显示名称 |
+| `parent_path` | 父级路径（构建树形菜单） |
+| `name` | 完整名称 |
+| `short_name` | 菜单显示名称 |
 | `icon` | 图标 |
-| `sortOrder` | 排序 |
-| `status` | 状态 |
+| `component` | Vue 组件路径 |
+| `sort_order` | 排序 |
+| `is_visible` | 菜单可见性 |
+| `is_menu` | 是否作为菜单项 |
+| `view_settings` | JSON 格式的页面配置 |
 
-**Fallback 策略**：无配置时使用默认值快速暴露问题
-- `shortName` → 文件夹名
-- `icon` → `help-circle`（问号）
-- `sortOrder` → `-1`（排最前）
+**三大核心功能**：
+1. **菜单系统数据源** - 左侧导航菜单的完整树形结构
+2. **路由配置中心** - 前端动态路由的生成依据
+3. **页面元数据管理** - 页面标题、描述、权限等配置
+
+**同步机制（零容忍）**：
+```bash
+php artisan view:sync       # 文件变化后立即同步
+php artisan view:validate   # 提交前验证一致性
+php artisan view:fix        # 自动修复不一致
+```
+
+**Fallback 策略**：无配置时使用简单二元规则快速暴露问题
+- `short_name` → `name`（不要多级降级）
+- `icon` → `help-circle`（问号图标）
+- `sort_order` → `999`（排最后）
+
+**实践案例**：YYSYYF 项目 `yys_manifest_list` 表
+- 150+ 条记录覆盖 8 个业务模块
+- 树形菜单通过 `parent_path` 构建
+- Redis 缓存 + 1 小时 TTL
+- 自动同步命令保持文件系统与数据库一致
 
 详见：[02.backend-04.db-manifest.md](docs/standards/02.backend-04.db-manifest.md)
 
