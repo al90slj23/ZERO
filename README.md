@@ -35,7 +35,7 @@ API路径：/api/admin/users/config/levels
 3. **行业通用 > 项目特定** - 使用行业公认术语，避免自创缩写
 4. **精准语义 > 模糊简称** - `processUserRegistration()` 而非 `process()`
 
-详见：[04.quality-00.naming-philosophy.md](specification/standards/04.quality-00.naming-philosophy.md)
+详见：[04.quality-00.naming-philosophy.md](rules/standards/04.quality-00.naming-philosophy.md)
 
 ---
 
@@ -51,40 +51,43 @@ Zero/
 ├── gogogo.1.sh                         # 选项 1: 部署（默认）
 ├── gogogo.2.sh                         # 选项 2: 检查状态
 ├── gogogo.3.sh                         # 选项 3: 清缓存
-└── specification/                      # 📋 规范文档（改为 specification 避免与项目 docs 冲突）
-    │
-    ├── standards/                      # 框架基础规范
-    │   ├── 00.meta-01.core.md         # 元规范
-    │   ├── 01.arch-01.core.md         # 核心架构原则
-    │   ├── 01.arch-02.structure.md    # 路径映射规范
-    │   ├── 02.backend-01.api.md       # API设计规范
-    │   ├── 02.backend-02.db-tables.md # 数据库表命名规范
-    │   ├── 02.backend-03.db-fields.md # 数据库字段规范
-    │   ├── 02.backend-04.db-manifest.md # 页面清单表规范
-    │   ├── 03.frontend-01.structure.md # 文件命名规范
-    │   ├── 04.quality-00.naming-philosophy.md # 命名哲学（AI友好）
-    │   ├── 04.quality-01.naming.md    # 命名规范
-    │   ├── 05.biz-01.menu.md          # 侧边栏菜单规范
-    │   ├── 06.quality-01.size.md      # 文件大小与拆分规范
-    │   ├── 06.quality-02.git.md       # Git提交规范
-    │   ├── 06.quality-03.error.md     # 错误处理规范
-    │   ├── 06.quality-04.header.md    # 文件头注释规范
-    │   ├── 09.tool-01.gogogo-sh.md    # gogogo.sh 脚本规范
-    │   └── 09.tool-02.deployignore.md # 部署排除规则规范
-    │
-    ├── condensed/                      # 精炼版规范（100-150行/文件）
-    │   └── ...                         # 核心规范的精炼版本
-    │
-    ├── references/                     # 组件/功能参考（具体实现）
-    │   ├── README.md                  # 参考文档索引
-    │   ├── admin-layout.md            # 管理后台 ABCD 布局
-    │   ├── vanilla-spa.md             # 原生 SPA 实现参考
-    │   ├── database-table-*.md        # 通用表格组件（8个文件）
-    │   └── manifest-admin.md          # Manifest 管理页面
-    │
-    └── inspirations/                   # 灵感来源库
-        ├── README.md                  # 灵感来源库说明
-        └── ECC/                       # Everything Claude Code 参考
+├── rules/                             # 📋 规范文档集合
+│   ├── standards/                      # 框架基础规范
+│   │   ├── 00.meta-01.core.md         # 元规范
+│   │   ├── 01.arch-01.core.md         # 核心架构原则
+│   │   ├── 01.arch-02.structure.md    # 路径映射规范
+│   │   ├── 02.backend-01.api.md       # API设计规范
+│   │   ├── 02.backend-02.db-tables.md # 数据库表命名规范
+│   │   ├── 02.backend-03.db-fields.md # 数据库字段规范
+│   │   ├── 02.backend-04.db-manifest.md # 页面清单表规范
+│   │   ├── 03.frontend-01.structure.md # 文件命名规范
+│   │   ├── 04.quality-00.naming-philosophy.md # 命名哲学（AI友好）
+│   │   ├── 04.quality-01.naming.md    # 命名规范
+│   │   ├── 05.biz-01.menu.md          # 侧边栏菜单规范
+│   │   ├── 06.quality-01.size.md      # 文件大小与拆分规范
+│   │   ├── 06.quality-02.git.md       # Git提交规范
+│   │   ├── 06.quality-03.error.md     # 错误处理规范
+│   │   ├── 06.quality-04.header.md    # 文件头注释规范
+│   │   ├── 09.tool-01.gogogo-sh.md    # gogogo.sh 脚本规范
+│   │   └── 09.tool-02.deployignore.md # 部署排除规则规范
+│   │
+│   ├── condensed/                      # 精炼版规范（100-150行/文件）
+│   │   └── ...                         # 核心规范的精炼版本
+│   │
+│   ├── references/                     # 组件/功能参考（具体实现）
+│   │   ├── README.md                  # 参考文档索引
+│   │   ├── admin-layout.md            # 管理后台 ABCD 布局
+│   │   ├── vanilla-spa.md             # 原生 SPA 实现参考
+│   │   ├── database-table-*.md        # 通用表格组件（8个文件）
+│   │   └── manifest-admin.md          # Manifest 管理页面
+│   │
+│   └── inspirations/                   # 灵感来源库
+│       ├── README.md                  # 灵感来源库说明
+│       └── ECC/                       # Everything Claude Code 参考
+│
+└── worklogs/                           # 📝 工作日志集合
+    ├── summaries/                      # 工作总结
+    └── README.md                       # 工作日志说明
 ```
 
 ---
