@@ -1,6 +1,6 @@
 #!/bin/bash
 # ================================================================
-# 文件名: go.3.sh
+# 文件名: gogogo.3.sh
 # 中文名: 选项 3 - 清除缓存
 # 创建时间: 2025-12-30
 # ================================================================
@@ -20,19 +20,19 @@ step "清除前端缓存..."
 
 # 清除 node_modules/.cache
 if [ -d "node_modules/.cache" ]; then
-    rm -rf node_modules/.cache
-    success "已清除 node_modules/.cache"
+	rm -rf node_modules/.cache
+	success "已清除 node_modules/.cache"
 fi
 
 # 清除构建输出
 if [ -d "dist" ]; then
-    rm -rf dist
-    success "已清除 dist/"
+	rm -rf dist
+	success "已清除 dist/"
 fi
 
 if [ -d "build" ]; then
-    rm -rf build
-    success "已清除 build/"
+	rm -rf build
+	success "已清除 build/"
 fi
 
 # ============================================================
@@ -43,16 +43,16 @@ step "清除后端缓存..."
 
 # PHP Laravel
 if [ -f "artisan" ]; then
-    php artisan config:clear 2>/dev/null && success "已清除 Laravel config 缓存"
-    php artisan route:clear 2>/dev/null && success "已清除 Laravel route 缓存"
-    php artisan view:clear 2>/dev/null && success "已清除 Laravel view 缓存"
-    php artisan cache:clear 2>/dev/null && success "已清除 Laravel cache"
+	php artisan config:clear 2>/dev/null && success "已清除 Laravel config 缓存"
+	php artisan route:clear 2>/dev/null && success "已清除 Laravel route 缓存"
+	php artisan view:clear 2>/dev/null && success "已清除 Laravel view 缓存"
+	php artisan cache:clear 2>/dev/null && success "已清除 Laravel cache"
 fi
 
 # Python Django
 if [ -f "manage.py" ]; then
-    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null
-    success "已清除 Python __pycache__"
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null
+	success "已清除 Python __pycache__"
 fi
 
 # ============================================================

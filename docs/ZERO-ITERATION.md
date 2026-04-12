@@ -77,11 +77,11 @@ git pull origin main
 ```bash
 # 修改文件
 vim docs/standards/xxx.md
-vim go.lib.sh
+vim gogogo.lib.sh
 # ...
 
 # 测试修改
-./go.sh
+./gogogo.sh
 ```
 
 ### 第三步：提交并推送
@@ -285,10 +285,10 @@ git push origin v1.1.0
 
 ### Added
 - 新增 .deployignore 部署排除规则规范
-- go.lib.sh 添加 build_rsync_excludes 函数
+- gogogo.lib.sh 添加 build_rsync_excludes 函数
 
 ### Changed
-- go.2.sh 使用配置文件而非硬编码排除规则
+- gogogo.2.sh 使用配置文件而非硬编码排除规则
 ```
 
 ---

@@ -44,12 +44,12 @@ API路径：/api/admin/users/config/levels
 ```
 Zero/
 ├── README.md                           # 本文件（浓缩导航版）
-├── go.sh                               # 统一入口脚本
-├── go.lib.sh                           # 通用库
-├── go.0.sh                             # 选项 0: 本地开发
-├── go.1.sh                             # 选项 1: 部署（默认）
-├── go.2.sh                             # 选项 2: 检查状态
-├── go.3.sh                             # 选项 3: 清缓存
+├── gogogo.sh                               # 统一入口脚本
+├── gogogo.lib.sh                           # 通用库
+├── gogogo.0.sh                             # 选项 0: 本地开发
+├── gogogo.1.sh                             # 选项 1: 部署（默认）
+├── gogogo.2.sh                             # 选项 2: 检查状态
+├── gogogo.3.sh                             # 选项 3: 清缓存
 └── docs/
     ├── ZERO-ITERATION.md              # ZERO 框架迭代流程（元文档）
     │
@@ -74,7 +74,7 @@ Zero/
     │   ├── 06.quality-02.git.md       # Git提交规范
     │   ├── 06.quality-03.error.md     # 错误处理规范
     │   ├── 06.quality-04.header.md    # 文件头注释规范
-    │   ├── 09.tool-01.gosh.md         # go.sh 脚本规范
+    │   ├── 09.tool-01.gogogo-sh.md         # gogogo.sh 脚本规范
     │   └── 09.tool-02.deployignore.md # 部署排除规则规范
     │
     ├── references/         # 组件/功能参考（具体实现）
@@ -346,15 +346,15 @@ FeatureName.FileType.ext
 
 ---
 
-## 🚀 go.sh 统一入口脚本
+## 🚀 gogogo.sh 统一入口脚本
 
 **统一入口**：一个命令搞定所有常用操作。
 
 ### 使用方式
 
 ```bash
-./go.sh        # 交互式菜单
-./go.sh 1      # 直接执行选项 1
+./gogogo.sh        # 交互式菜单
+./gogogo.sh 1      # 直接执行选项 1
 ```
 
 ### 选项编号
@@ -370,15 +370,15 @@ FeatureName.FileType.ext
 ### 文件结构
 
 ```
-go.sh          # 主入口
-go.lib.sh      # 通用库
-go.0.sh        # 选项 0: 本地开发
-go.1.sh        # 选项 1: 部署（默认）
-go.2.sh        # 选项 2: 检查状态
+gogogo.sh          # 主入口
+gogogo.lib.sh      # 通用库
+gogogo.0.sh        # 选项 0: 本地开发
+gogogo.1.sh        # 选项 1: 部署（默认）
+gogogo.2.sh        # 选项 2: 检查状态
 ...
 ```
 
-详见：[09.tool-01.gosh.md](docs/standards/09.tool-01.gosh.md)
+详见：[09.tool-01.gogogo-sh.md](docs/standards/09.tool-01.gogogo-sh.md)
 
 ---
 
