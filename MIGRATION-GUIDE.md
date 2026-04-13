@@ -2,7 +2,7 @@
 
 > **迁移日期**：2026-04-12
 > **版本**：v1.1.0
-> **变更**：`docs/` → `specification/`
+> **变更**：`docs/` → `rules/`
 
 ---
 
@@ -23,7 +23,7 @@ ZERO/
 
 ```
 ZERO/
-├── specification/
+├── rules/
 │   ├── standards/
 │   ├── condensed/
 │   ├── references/
@@ -40,7 +40,7 @@ ZERO/
 3. **路径复杂**：在项目中引用 ZERO 规范时需要特殊处理路径
 
 ### 解决方案
-1. **使用专有目录名**：`specification/` 明确表示这是规范集合
+1. **使用专有目录名**：`rules/` 明确表示这是规范集合
 2. **避免冲突**：与项目的 `docs/` 目录完全分离
 3. **清晰结构**：项目结构更清晰
 
@@ -52,10 +52,10 @@ ZERO/
 
 | 原始路径 | 新路径 |
 |---------|--------|
-| `ZERO/docs/standards/` | `ZERO/specification/standards/` |
-| `ZERO/docs/condensed/` | `ZERO/specification/condensed/` |
-| `ZERO/docs/references/` | `ZERO/specification/references/` |
-| `ZERO/docs/inspirations/` | `ZERO/specification/inspirations/` |
+| `ZERO/docs/standards/` | `ZERO/rules/standards/` |
+| `ZERO/docs/condensed/` | `ZERO/rules/condensed/` |
+| `ZERO/docs/references/` | `ZERO/rules/references/` |
+| `ZERO/docs/inspirations/` | `ZERO/rules/inspirations/` |
 | `ZERO/docs/ZERO-ITERATION.md` | `ZERO/ZERO-ITERATION.md` |
 
 ### 链接修改示例
@@ -65,7 +65,7 @@ ZERO/
 [规范](./docs/standards/00.meta-01.core.md)
 
 # 新链接
-[规范](./specification/standards/00.meta-01.core.md)
+[规范](./rules/standards/00.meta-01.core.md)
 ```
 
 ---
@@ -104,20 +104,20 @@ ZERO/
 
 ```bash
 # 查看 ZERO 规范
-cat ZERO/specification/standards/00.meta-01.core.md
+cat ZERO/rules/standards/00.meta-01.core.md
 
 # 查看精炼版
-cat ZERO/specification/condensed/00.meta-01.core.md
+cat ZERO/rules/condensed/00.meta-01.core.md
 
 # 查看参考实现
-cat ZERO/specification/references/admin-layout.md
+cat ZERO/rules/references/admin-layout.md
 ```
 
 ### 在项目中引用 ZERO 规范
 
 ```markdown
 # 在项目文档中引用 ZERO
-[ZERO 元规范](../ZERO/specification/standards/00.meta-01.core.md)
+[ZERO 元规范](../ZERO/rules/standards/00.meta-01.core.md)
 [ZERO 快速参考](../ZERO/README.md)
 ```
 
@@ -136,7 +136,7 @@ cat ZERO/specification/references/admin-layout.md
    - 更新内部链接
 
 3. **持续维护**
-   - 新增文档时使用 `specification/` 路径
+   - 新增文档时使用 `rules/` 路径
    - 避免在 `docs/` 中添加新文件
 
 ### 对使用 ZERO 的项目
@@ -155,14 +155,14 @@ cat ZERO/specification/references/admin-layout.md
 
 - `ZERO/README.md` - ZERO 框架说明
 - `ZERO/ZERO-ITERATION.md` - ZERO 迭代流程
-- `ZERO/specification/standards/` - ZERO 规范集合
+- `ZERO/rules/standards/` - ZERO 规范集合
 
 ---
 
 ## ❓ FAQ
 
-### Q: 为什么要改为 `specification/`？
-A: 为了避免与项目中的 `docs/` 目录冲突，使用专有名称 `specification/` 清晰表示这是规范集合。
+### Q: 为什么要改为 `rules/`？
+A: 为了避免与项目中的 `docs/` 目录冲突，使用专有名称 `rules/` 清晰表示这是规范集合。
 
 ### Q: 旧链接还能用吗？
 A: 旧链接可以通过 Git 历史访问，但建议更新为新路径以保持一致性。
@@ -171,7 +171,7 @@ A: 旧链接可以通过 Git 历史访问，但建议更新为新路径以保持
 A: 使用 `sed` 或其他文本替换工具批量替换 `ZERO/docs` 为 `ZERO/specification`。
 
 ### Q: 这个变更对我的项目有影响吗？
-A: 如果你的项目直接引用了 `ZERO/docs/` 的路径，需要更新为 `ZERO/specification/`。
+A: 如果你的项目直接引用了 `ZERO/docs/` 的路径，需要更新为 `ZERO/rules/`。
 
 ---
 
