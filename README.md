@@ -51,6 +51,7 @@ Zero/
 ├── gogogo.1.sh                         # 选项 1: 部署（默认）
 ├── gogogo.2.sh                         # 选项 2: 检查状态
 ├── gogogo.3.sh                         # 选项 3: 清缓存
+├── gogogo.ai.sh                        # 选项 ai: AI 记忆体系管理
 ├── rules/                             # 📋 规范文档集合
 │   ├── standards/                      # 框架基础规范
 │   │   ├── 00.meta-01.core.md         # 元规范
@@ -69,7 +70,10 @@ Zero/
 │   │   ├── 06.quality-03.error.md     # 错误处理规范
 │   │   ├── 06.quality-04.header.md    # 文件头注释规范
 │   │   ├── 09.tool-01.gogogo-sh.md    # gogogo.sh 脚本规范
-│   │   └── 09.tool-02.deployignore.md # 部署排除规则规范
+│   │   ├── 09.tool-02.deployignore.md # 部署排除规则规范
+│   │   ├── 09.tool-03.ai-gogogo.md    # AI 管理入口规范
+│   │   ├── 10.ai-memory-01.architecture.md # AI 记忆体系架构（六层蒸馏）
+│   │   └── 10.ai-memory-02.naming.md  # AI 记忆体系命名与格式
 │   │
 │   ├── condensed/                      # 精炼版规范（100-150行/文件）
 │   │   └── ...                         # 核心规范的精炼版本

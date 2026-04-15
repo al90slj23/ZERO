@@ -14,11 +14,13 @@
 # gogogo.1.sh        - 选项 1: 本地开发服务器
 # gogogo.2.sh        - 选项 2: 部署到服务器
 # gogogo.3.sh        - 选项 3: 清除缓存
+# gogogo.ai.sh       - 选项 ai: AI 记忆体系管理
 # ...                - 按需扩展
 #
 # 【使用方法】
 # ./gogogo.sh        # 交互式菜单
 # ./gogogo.sh 1      # 直接执行选项1
+# ./gogogo.sh ai     # AI 记忆体系管理
 #
 # ================================================================
 
@@ -53,9 +55,10 @@ else
 	echo "3. 清除缓存"
 	echo "4. 运行测试"
 	echo "5. 构建生产版本"
+	echo "ai. AI 记忆体系管理"
 	echo "0. 退出"
 	echo ""
-	read -t 10 -p "请输入选择 (10秒后自动选择1): " choice
+	read -t 10 -p "请输入选择 (1/2/3/4/5/ai/0，10秒后自动选择1): " choice
 
 	if [ -z "$choice" ]; then
 		choice=1
