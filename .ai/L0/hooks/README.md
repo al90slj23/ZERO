@@ -159,8 +159,8 @@ ls -la .kiro/hooks/
 
 ## 相关文档
 
-- `ZERO/rules/standards/09.tool-04.hooks.md` - Kiro Hooks 完整规范
-- `ZERO/rules/standards/10.ai-memory-01.architecture.md` - 七层架构说明
+- `ZERO/.ai/L4/standards/09.tool-04.hooks.md` - Kiro Hooks 完整规范
+- `ZERO/.ai/L4/standards/10.ai-memory-01.architecture.md` - 七层架构说明
 
 ---
 

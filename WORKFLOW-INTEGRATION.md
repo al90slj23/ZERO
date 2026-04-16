@@ -86,7 +86,7 @@
 ```bash
 # 复制规范文件
 cp -r ZERO/rules/ your-project/
-cp -r ZERO/worklogs/ your-project/
+cp -r ZERO/.ai/L5/ your-project/
 
 # 配置 IDE
 # (具体步骤见工作流规范)
@@ -258,19 +258,19 @@ Cmd + K → "审查这段代码"
 ## 🔗 相关文档
 
 ### 工作流规范
-- [08.workflow-00.meta.md](rules/standards/08.workflow-00.meta.md) - 元文档
-- [08.workflow-01.cursor.md](rules/standards/08.workflow-01.cursor.md) - Cursor
-- [08.workflow-02.kiro.md](rules/standards/08.workflow-02.kiro.md) - Kiro
-- [08.workflow-03.claude-code.md](rules/standards/08.workflow-03.claude-code.md) - CLI
-- [08.workflow-04.opencode.md](rules/standards/08.workflow-04.opencode.md) - OpenCode
+- [08.workflow-00.meta.md](.ai/L4/standards/08.workflow-00.meta.md) - 元文档
+- [08.workflow-01.cursor.md](.ai/L4/standards/08.workflow-01.cursor.md) - Cursor
+- [08.workflow-02.kiro.md](.ai/L4/standards/08.workflow-02.kiro.md) - Kiro
+- [08.workflow-03.claude-code.md](.ai/L4/standards/08.workflow-03.claude-code.md) - CLI
+- [08.workflow-04.opencode.md](.ai/L4/standards/08.workflow-04.opencode.md) - OpenCode
 
 ### 核心规范
-- [rules/standards/](rules/standards/) - 所有规范
+- [.ai/L4/standards/](.ai/L4/standards/) - 所有规范
 - [README.md](rules/README.md) - 规范说明
 
 ### 日志规范
-- [07.worklog-01.daily-log.md](rules/standards/07.worklog-01.daily-log.md) - 日志规范
-- [worklogs/README.md](worklogs/README.md) - 日志说明
+- [07.worklog-01.daily-log.md](.ai/L4/standards/07.worklog-01.daily-log.md) - 日志规范
+- [.ai/L5/README.md](.ai/L5/README.md) - 日志说明
 
 ---
 

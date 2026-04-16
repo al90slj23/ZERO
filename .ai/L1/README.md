@@ -42,8 +42,8 @@ API路径：/api/admin/users/config/levels
 ## 📁 文档结构
 
 ```
-ZERO/
-├── README.md                           # 本文件（项目入口）
+Zero/
+├── README.md                           # 本文件（导航版）
 ├── ZERO-ITERATION.md                   # ZERO 框架迭代流程
 ├── gogogo.sh                           # 统一入口脚本
 ├── gogogo.lib.sh                       # 通用库
@@ -52,58 +52,46 @@ ZERO/
 ├── gogogo.2.sh                         # 选项 2: 检查状态
 ├── gogogo.3.sh                         # 选项 3: 清缓存
 ├── gogogo.ai.sh                        # 选项 ai: AI 记忆体系管理
-└── .ai/                                # 📋 AI 记忆体系（七层架构）
-    ├── L0/                             # 项目进度管理
-    │   ├── hooks/                      # IDE 和 Git 钩子
-    │   ├── skills/                     # AI 技能文档
-    │   ├── specs/                      # 功能规格
-    │   ├── templates/                  # 模板文件
-    │   └── workflows/                  # 工作流配置
-    │
-    ├── L1/                             # 概览文档
-    │   └── README.md                   # 项目概览（零容忍规则）
-    │
-    ├── L2/                             # 分类索引
-    │   └── README.md                   # 主题分类索引
-    │
-    ├── L3/                             # 精炼规范（100-150行/文件）
-    │   ├── 00.meta-01.core.md         # 元规范
-    │   ├── 01.arch-01.core.md         # 核心架构
-    │   ├── 02.backend-*.md            # 后端规范
-    │   ├── 03.frontend-*.md           # 前端规范
-    │   ├── 04.quality-*.md            # 质量规范
-    │   ├── 05.biz-*.md                # 业务规范
-    │   ├── 06.quality-*.md            # 质量规范
-    │   ├── 09.tool-*.md               # 工具规范
-    │   └── 10.ai-memory-*.md          # AI 记忆体系
-    │
-    ├── L4/                             # 完整规范
-    │   ├── standards/                  # 框架基础规范
-    │   │   ├── 00.meta-01.core.md     # 元规范
-    │   │   ├── 01.arch-*.md           # 架构规范
-    │   │   ├── 02.backend-*.md        # 后端规范
-    │   │   ├── 03.frontend-*.md       # 前端规范
-    │   │   ├── 04.quality-*.md        # 质量规范
-    │   │   ├── 05.biz-*.md            # 业务规范
-    │   │   ├── 06.quality-*.md        # 质量规范
-    │   │   ├── 08.workflow-*.md       # 工作流规范
-    │   │   ├── 09.tool-*.md           # 工具规范
-    │   │   └── 10.ai-memory-*.md      # AI 记忆体系
-    │   │
-    │   ├── references/                 # 组件/功能参考
-    │   │   ├── README.md              # 参考文档索引
-    │   │   ├── admin-layout.md        # 管理后台布局
-    │   │   └── ...                    # 其他参考实现
-    │   │
-    │   └── inspirations/               # 灵感来源库
-    │       ├── README.md              # 灵感来源说明
-    │       └── ECC/                   # Everything Claude Code
-    │
-    ├── L5/                             # 操作日志
-    │   └── README.md                   # 工作日志说明
-    │
-    └── L6/                             # 知识图谱（可选）
-        └── README.md                   # 知识图谱说明
+├── rules/                             # 📋 规范文档集合
+│   ├── standards/                      # 框架基础规范
+│   │   ├── 00.meta-01.core.md         # 元规范
+│   │   ├── 01.arch-01.core.md         # 核心架构原则
+│   │   ├── 01.arch-02.structure.md    # 路径映射规范
+│   │   ├── 02.backend-01.api.md       # API设计规范
+│   │   ├── 02.backend-02.db-tables.md # 数据库表命名规范
+│   │   ├── 02.backend-03.db-fields.md # 数据库字段规范
+│   │   ├── 02.backend-04.db-manifest.md # 页面清单表规范
+│   │   ├── 03.frontend-01.structure.md # 文件命名规范
+│   │   ├── 04.quality-00.naming-philosophy.md # 命名哲学（AI友好）
+│   │   ├── 04.quality-01.naming.md    # 命名规范
+│   │   ├── 05.biz-01.menu.md          # 侧边栏菜单规范
+│   │   ├── 06.quality-01.size.md      # 文件大小与拆分规范
+│   │   ├── 06.quality-02.git.md       # Git提交规范
+│   │   ├── 06.quality-03.error.md     # 错误处理规范
+│   │   ├── 06.quality-04.header.md    # 文件头注释规范
+│   │   ├── 09.tool-01.gogogo-sh.md    # gogogo.sh 脚本规范
+│   │   ├── 09.tool-02.deployignore.md # 部署排除规则规范
+│   │   ├── 09.tool-03.ai-gogogo.md    # AI 管理入口规范
+│   │   ├── 10.ai-memory-01.architecture.md # AI 记忆体系架构（七层蒸馏）
+│   │   └── 10.ai-memory-02.naming.md  # AI 记忆体系命名与格式
+│   │
+│   ├── condensed/                      # 精炼版规范（100-150行/文件）
+│   │   └── ...                         # 核心规范的精炼版本
+│   │
+│   ├── references/                     # 组件/功能参考（具体实现）
+│   │   ├── README.md                  # 参考文档索引
+│   │   ├── admin-layout.md            # 管理后台 ABCD 布局
+│   │   ├── vanilla-spa.md             # 原生 SPA 实现参考
+│   │   ├── database-table-*.md        # 通用表格组件（8个文件）
+│   │   └── manifest-admin.md          # Manifest 管理页面
+│   │
+│   └── inspirations/                   # 灵感来源库
+│       ├── README.md                  # 灵感来源库说明
+│       └── ECC/                       # Everything Claude Code 参考
+│
+└── .ai/L5/                           # 📝 工作日志集合
+    ├── summaries/                      # 工作总结
+    └── README.md                       # 工作日志说明
 ```
 
 ---
