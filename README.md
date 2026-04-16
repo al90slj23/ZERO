@@ -189,6 +189,10 @@ php artisan view:fix        # 自动修复不一致
 
 详见：[05.biz-01.menu.md](.ai/L4/standards/05.biz-01.menu.md)
 
+### 迁移指南
+
+从旧版 `rules/` 目录结构迁移到新版 `.ai/` 七层架构，详见：[migration-guide-v2.md](.ai/L4/references/migration-guide-v2.md)
+
 ### 表命名
 
 ```
