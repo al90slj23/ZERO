@@ -47,7 +47,16 @@ echo ""
 # 获取选择（支持命令行参数或交互式输入）
 if [ -n "$1" ]; then
 	choice="$1"
-	echo -e "${GREEN}📌 执行选项: ${choice}${NC}"
+	# 检查是否有子选项（如 8f 中的 f）
+	if [[ "$choice" =~ ^([0-9]+|ai)(.*)$ ]]; then
+		main_choice="${BASH_REMATCH[1]}"
+		sub_choice="${BASH_REMATCH[2]}"
+		echo -e "${GREEN}📌 执行选项: ${main_choice}${sub_choice}${NC}"
+		choice="$main_choice"
+	else
+		echo -e "${GREEN}📌 执行选项: ${choice}${NC}"
+		sub_choice=""
+	fi
 else
 	echo -e "${YELLOW}请选择操作：${NC}"
 	echo "1. 启动本地开发服务器"
@@ -55,10 +64,11 @@ else
 	echo "3. 清除缓存"
 	echo "4. 运行测试"
 	echo "5. 构建生产版本"
+	echo "8. AI 记忆体系映射管理（8f=映射所有 8g=移除所有）"
 	echo "ai. AI 记忆体系管理"
 	echo "0. 退出"
 	echo ""
-	read -t 10 -p "请输入选择 (1/2/3/4/5/ai/0，10秒后自动选择1): " choice
+	read -t 10 -p "请输入选择 (1/2/3/4/5/8/ai/0，10秒后自动选择1): " choice
 
 	if [ -z "$choice" ]; then
 		choice=1
@@ -80,7 +90,12 @@ export START_TIME
 # 检查对应的子脚本是否存在
 SUB_SCRIPT="$SCRIPT_DIR/gogogo.${choice}.sh"
 if [ -f "$SUB_SCRIPT" ]; then
-	source "$SUB_SCRIPT"
+	# 如果有子选项，将其作为参数传递给子脚本
+	if [ -n "${sub_choice:-}" ]; then
+		source "$SUB_SCRIPT" "$sub_choice"
+	else
+		source "$SUB_SCRIPT"
+	fi
 
 	# 显示耗时
 	show_elapsed_time "$START_TIME"
