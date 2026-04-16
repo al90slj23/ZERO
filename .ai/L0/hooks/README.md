@@ -7,12 +7,15 @@
 ```
 .ai/L0/hooks/
 ├── README.md                           ← 本文件
-├── kiro/                               ← Kiro IDE hooks（.json 格式）
-│   ├── standards-sync-on-complete.json ← 规范同步检查（推荐）
-│   └── pre-commit-typecheck.json       ← 提交前类型检查（可选）
+├── standards-sync-on-complete.json     ← 规范同步检查（推荐）
 ├── husky/                              ← Git hooks（通过 Husky）
 └── ide/                                ← 其他 IDE hooks
 ```
+
+**架构说明**：
+- Hook 配置文件（`.json`）直接存放在 `.ai/L0/hooks/` 目录下
+- 各 IDE/平台通过符号链接映射到自己的目录，并转换格式
+- 例如：`.ai/L0/hooks/standards-sync-on-complete.json` → `.kiro/hooks/standards-sync-on-complete.kiro.hook`
 
 ## 核心原则
 
@@ -25,7 +28,7 @@
 
 ### 1. 规范同步检查（强烈推荐）⭐
 
-**文件**：`kiro/standards-sync-on-complete.json`
+**文件**：`standards-sync-on-complete.json`
 
 **用途**：任务完成后自动检查是否涉及规范变更，若有则强制执行 L4→L3→L2→L1 全链路同步
 
@@ -58,7 +61,7 @@ Hook 自动触发
 
 ### 2. 提交前类型检查（可选）
 
-**文件**：`kiro/pre-commit-typecheck.json`
+**文件**：`pre-commit-typecheck.json`
 
 **用途**：提交代码前检查 TypeScript 类型错误
 
@@ -102,7 +105,7 @@ cp -r ZERO/.ai-example/L0/hooks/ .ai/L0/hooks/
 
 ### 2. 根据需要调整
 
-编辑 `.ai/L0/hooks/kiro/*.json` 文件，调整配置。
+编辑 `.ai/L0/hooks/*.json` 文件，调整配置。
 
 ### 3. 映射到 Kiro
 
@@ -151,7 +154,8 @@ ls -la .kiro/hooks/
 
 3. **Hook 文件名要清晰**
    - 使用描述性名称
-   - 例如：`standards-sync-on-complete.json`
+   - 直接放在 `.ai/L0/hooks/` 目录下
+   - 例如：`.ai/L0/hooks/standards-sync-on-complete.json`
 
 4. **测试 Hook 配置**
    - 创建后先测试是否正常触发

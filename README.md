@@ -108,6 +108,79 @@ ZERO/
 
 ---
 
+## 🚀 快速开始
+
+### 使用 ZERO 框架的项目
+
+如果你的项目使用了 ZERO 框架，以下是关键的使用指南：
+
+#### 1. L0 目录 - 项目进度管理（重要！）
+
+`.ai/L0/` 是你管理项目 hooks、skills、specs 的地方。
+
+**核心原则（零容忍）**：
+- ✅ **源文件直接放在 L0 子目录**：`.ai/L0/hooks/*.json`、`.ai/L0/skills/{name}/`
+- ✅ **通过符号链接映射到 IDE**：运行 `./gogogo.sh 8a`（Kiro）或 `./gogogo.sh 8f`（所有工具）
+- ❌ **禁止直接修改映射目标**：`.kiro/hooks/`、`.kiro/skills/` 等是只读
+
+**创建新 Hook**：
+```bash
+# 1. 在 L0 创建源文件
+touch .ai/L0/hooks/my-hook.json
+
+# 2. 编辑配置（必须包含 "enabled": true）
+vim .ai/L0/hooks/my-hook.json
+
+# 3. 映射到 Kiro
+./gogogo.sh 8a
+
+# 4. 验证
+ls -la .kiro/hooks/my-hook.kiro.hook
+```
+
+**创建新 Skill**：
+```bash
+# 1. 创建 skill 目录
+mkdir -p .ai/L0/skills/my-skill
+
+# 2. 创建 SKILL.md（必须包含 frontmatter）
+vim .ai/L0/skills/my-skill/SKILL.md
+
+# 3. 映射到 Kiro
+./gogogo.sh 8a
+
+# 4. 验证
+ls -la .kiro/skills/my-skill/SKILL.md
+```
+
+**详细说明**：
+- Hooks：查看 [.ai/L0/hooks/README.md](.ai/L0/hooks/README.md)
+- Skills：查看 [.ai/L0/skills/README.md](.ai/L0/skills/README.md)
+- Specs：查看 [.ai/L0/specs/README.md](.ai/L0/specs/README.md)
+- Workflows：查看 [.ai/L0/workflows/README.md](.ai/L0/workflows/README.md)
+
+#### 2. 规范文档查阅顺序
+
+```
+L1（零容忍规则）→ L2（分类索引）→ L3（精炼规范）→ L4（完整规范）
+```
+
+- **L1**：[.ai/L1/README.md](.ai/L1/README.md) - 项目概览和零容忍规则
+- **L2**：按主题分类的索引（架构、后端、前端、质量等）
+- **L3**：精炼规范（100-150行/文件，AI 优先读取）
+- **L4**：完整规范（详细说明，人类阅读）
+
+#### 3. gogogo.sh 常用命令
+
+```bash
+./gogogo.sh 0      # 本地开发
+./gogogo.sh 8a     # 映射 L0 到 Kiro
+./gogogo.sh 8f     # 映射 L0-L3 到所有 IDE
+./gogogo.sh 8g     # 移除所有映射
+```
+
+---
+
 ## 🔄 路径映射规则
 
 | 源 | 目标 | 转换方法 | 举例 |
@@ -410,9 +483,14 @@ gogogo.2.sh        # 选项 2: 检查状态
 2. **API虚拟参数禁用斜杠**，必须用冒号
 3. **文件超800行必须拆分**
 4. **数据库通用语义后缀用单数**
-5. **修改代码必须同步更新文件头注释**
-6. **Commit 必须符合格式规范**
-7. **规范变更必须执行冲突检测**（开发方法论级）
+5. **L0 架构原则**（平台无关源文件 + 符号链接映射）⭐
+   - **源文件直接放在 L0 子目录**：`.ai/L0/hooks/*.json`、`.ai/L0/skills/{name}/`（不套 `kiro/` 等平台子目录）
+   - **通过符号链接映射到各 IDE**：运行 `./gogogo.sh 8a` 或 `./gogogo.sh 8f`
+   - **禁止直接修改映射目标**：`.kiro/hooks/`、`.kiro/skills/` 等是只读映射目标
+   - 详见：[.ai/L0/README.md](.ai/L0/README.md)
+6. **修改代码必须同步更新文件头注释**
+7. **Commit 必须符合格式规范**
+8. **规范变更必须执行冲突检测**（开发方法论级）
    - 有 hook 能力的 IDE（Kiro、Claude Code）→ 自动触发
    - 无 hook 能力的环境（Cursor、CLI）→ 手动执行
    - 四步检测：L4 内部冲突 → L3-L4 一致性 → L2 索引 → L1 宪法级
