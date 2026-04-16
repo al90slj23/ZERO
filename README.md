@@ -72,7 +72,7 @@ Zero/
 │   │   ├── 09.tool-01.gogogo-sh.md    # gogogo.sh 脚本规范
 │   │   ├── 09.tool-02.deployignore.md # 部署排除规则规范
 │   │   ├── 09.tool-03.ai-gogogo.md    # AI 管理入口规范
-│   │   ├── 10.ai-memory-01.architecture.md # AI 记忆体系架构（六层蒸馏）
+│   │   ├── 10.ai-memory-01.architecture.md # AI 记忆体系架构（七层蒸馏）
 │   │   └── 10.ai-memory-02.naming.md  # AI 记忆体系命名与格式
 │   │
 │   ├── condensed/                      # 精炼版规范（100-150行/文件）
@@ -411,4 +411,4 @@ const name = config?.shortName || folderName
 
 ---
 
-**最后更新**：2025-12-31
+**最后更新**：2026-04-16
