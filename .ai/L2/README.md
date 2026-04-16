@@ -46,7 +46,11 @@ ZERO 是以文件夹路径为唯一主体的命名规范框架（路径为王）
   - gogogo.sh 统一入口脚本
   - 部署、开发、缓存管理
 
-- **AI 记忆体系** - `10.ai-memory-01.architecture.md`
+- **AI 记忆体系管理** - `09.tool-03.ai-gogogo.md`
+  - gogogo.sh 8：IDE 映射管理（L1/L2/L3 → 各 IDE）
+  - gogogo.sh ai：AI 体系状态、Kiro specs 同步、L5 日志
+
+- **AI 记忆体系架构** - `10.ai-memory-01.architecture.md`
   - 七层架构（L0-L6）
   - 文档蒸馏与映射
 
