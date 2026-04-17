@@ -47,12 +47,21 @@ ZERO 是以文件夹路径为唯一主体的命名规范框架（路径为王）
   - 部署、开发、缓存管理
 
 - **AI 记忆体系管理** - `09.tool-03.ai-gogogo.md`
-  - gogogo.sh 8：IDE 映射管理（L1/L2/L3 → 各 IDE）
-  - gogogo.sh ai：AI 体系状态、Kiro specs 同步、L5 日志
+  - gogogo.sh 8：IDE 映射管理（L1#项目概览 (Overview)/L2#规范索引 (Index)/L3#完整规范 (Standards) → 各 IDE）
+  - gogogo.sh ai：AI 体系状态、Kiro specs 同步、L4#操作日志 (Changelog) 日志
 
 - **AI 记忆体系架构** - `10.ai-memory-01.architecture.md`
-  - 七层架构（L0-L6）
+  - 六层架构（L0#工作执行 (Execution) - L5#知识图谱 (Knowledge)）
   - 文档蒸馏与映射
+
+- **六层架构命名规范** - `10.ai-memory-02.naming.md`
+  - 六层架构文件命名规范
+  - 各层命名方式和分类编号
+
+- **六层架构官方命名对照表** - `10.ai-memory-03.six-layer-naming.md`
+  - 中英文命名对照表
+  - 文件夹和文档引用格式
+  - 从七层迁移到六层的步骤
 
 #### 工作流与集成
 

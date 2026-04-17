@@ -1,4 +1,4 @@
-# L0/skills - AI 技能文档
+# L0#Execution/skills - AI 技能文档
 
 **定位**：管理 AI 技能文档（Skills），遵循 agentskills.io 标准。
 
@@ -18,14 +18,14 @@
    - OpenCode：`.opencode/skills/{name}/`
 
 3. **禁止直接修改映射目标**：
-   - 所有修改都在 `.ai/L0/skills/` 进行
+   - 所有修改都在 `.ai/L0#Execution/skills/` 进行
 
 ---
 
 ## 目录结构
 
 ```
-.ai/L0/skills/
+.ai/L0#Execution/skills/
 ├── README.md                  # 本文档
 └── {skill-name}/              # 技能目录（小写字母 + 连字符）
     ├── SKILL.md               # 技能主文档（必须）
@@ -76,10 +76,10 @@ version: 1.0.0
 
 ```bash
 # 1. 创建技能目录
-mkdir -p .ai/L0/skills/my-skill
+mkdir -p .ai/L0#Execution/skills/my-skill
 
 # 2. 创建 SKILL.md
-cat > .ai/L0/skills/my-skill/SKILL.md << 'EOF'
+cat > .ai/L0#Execution/skills/my-skill/SKILL.md << 'EOF'
 ---
 name: my-skill
 description: 我的技能描述
@@ -147,9 +147,9 @@ ls -la .kiro/skills/my-skill/SKILL.md
 
 ## 映射关系
 
-| L0 源目录 | Kiro | Claude Code | OpenCode |
+| L0#工作执行 (Execution) 源目录 | Kiro | Claude Code | OpenCode |
 |-----------|------|-------------|----------|
-| `.ai/L0/skills/{name}/` | `.kiro/skills/{name}/` | `.claude/skills/{name}/` | `.opencode/skills/{name}/` |
+| `.ai/L0#Execution/skills/{name}/` | `.kiro/skills/{name}/` | `.claude/skills/{name}/` | `.opencode/skills/{name}/` |
 
 **注意**：
 - Cursor 不支持 Skills
@@ -196,7 +196,7 @@ discloseContext(name: "skill-name")
 
 1. **SKILL.md 是必须文件**：每个 skill 目录必须包含
 2. **frontmatter 是必须的**：name、description、version 三个字段
-3. **不要直接修改映射目标**：所有修改在 `.ai/L0/skills/` 进行
+3. **不要直接修改映射目标**：所有修改在 `.ai/L0#Execution/skills/` 进行
 4. **新增 skill 后运行映射命令**：`./gogogo.sh 8a`
 5. **保持 skill 独立**：每个 skill 一个目录，不要合并
 

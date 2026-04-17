@@ -1,11 +1,11 @@
-# L0/templates - 模板文件
+# L0#Execution/templates - 模板文件
 
 **定位**：项目模板文件，用于快速创建标准化的配置和文档。
 
 ## 目录结构
 
 ```
-.ai/L0/templates/
+.ai/L0#Execution/templates/
 ├── README.md
 ├── hook-template.json       钩子配置模板
 ├── spec-template.md         Spec 文档模板
@@ -20,11 +20,11 @@
 
 #### hook-template.json
 - **用途**：创建新的 IDE 钩子配置
-- **使用**：复制到 `.ai/L0/hooks/`，修改配置
+- **使用**：复制到 `.ai/L0#Execution/hooks/`，修改配置
 
 #### spec-template.md
 - **用途**：创建新的功能规格文档
-- **使用**：复制到 `.ai/L0/specs/{feature-name}/`，填写内容
+- **使用**：复制到 `.ai/L0#Execution/specs/{feature-name}/`，填写内容
 
 #### workflow-template.yml
 - **用途**：创建新的 CI/CD 工作流
