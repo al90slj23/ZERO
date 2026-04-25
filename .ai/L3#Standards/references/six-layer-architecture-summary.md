@@ -1,7 +1,7 @@
 # 六层架构实践总结
 
-> **来源项目**：AiLinkDog  
-> **创建日期**：2026-04-17  
+> **来源项目**：AiLinkDog
+> **创建日期**：2026-04-17
 > **文档类型**：参考实现
 
 ---
@@ -118,8 +118,8 @@ mv .ai/L0 ".ai/L0#Execution"
 mv .ai/L1 ".ai/L1#Overview"
 mv .ai/L2 ".ai/L2#Index"
 mv .ai/L3 ".ai/L3#Standards"
-mv .ai/L4 ".ai/L4#Changelog"
-mv .ai/L5 ".ai/L5#Knowledge"
+mv .ai/L5 ".ai/L4#Changelog"
+mv .ai/L6 ".ai/L5#Knowledge"
 ```
 
 ### Phase 2: 更新文档引用
@@ -279,7 +279,7 @@ ls -la .kiro/steering/
 
 ### Q1: 为什么不使用 `L0-Execution` 或 `L0_Execution`？
 
-**A**: 
+**A**:
 - `-` 和 `_` 在项目中已有其他用途（如 `api-design.md`、`admin_users` 表名）
 - `#` 符号语义更明确，视觉上更清晰
 - `#` 在所有平台和工具中都兼容
@@ -322,6 +322,5 @@ ls -la .kiro/steering/
 
 ---
 
-**最后更新**：2026-04-17  
+**最后更新**：2026-04-17
 **维护者**：ZERO Framework Team
-

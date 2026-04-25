@@ -24,9 +24,9 @@ fi
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ================================================================
-# L2 分类索引文件列表（所有工具共用）
+# L2#规范索引 (Index) 文件列表（所有工具共用）
 # ================================================================
-L2_FILES=(00.meta 01.arch 02.backend 03.frontend 04.data 05.biz 06.quality 07.security 08.ops 09.tool 10.ref)
+L2_FILES=(README toc)
 
 # ================================================================
 # 映射定义（单一数据源）
@@ -35,33 +35,31 @@ L2_FILES=(00.meta 01.arch 02.backend 03.frontend 04.data 05.biz 06.quality 07.se
 build_mappings() {
     MAPPINGS=()
 
-    # L1 概览 → 各 IDE 的概览文件（单文件链接）
+    # L1#项目概览 (Overview) → 各 IDE 的概览文件（单文件链接）
     MAPPINGS+=(
-        "L1/README.md|AGENTS.md|L1→AGENTS.md"
-        "L1/README.md|CLAUDE.md|L1→CLAUDE.md"
-        "L1/README.md|.cursorrules|L1→.cursorrules"
-        "L1/README.md|.windsurfrules|L1→.windsurfrules"
+        "L1#Overview/guide.md|AGENTS.md|L1#Overview→AGENTS.md"
+        "L1#Overview/guide.md|CLAUDE.md|L1#Overview→CLAUDE.md"
+        "L1#Overview/guide.md|.cursorrules|L1#Overview→.cursorrules"
+        "L1#Overview/guide.md|.windsurfrules|L1#Overview→.windsurfrules"
     )
 
-    # L2 分类索引 → 各工具的自动载入目录（逐文件，排除 README.md）
+    # L2#规范索引 (Index) → 各工具的自动载入目录（逐文件）
     for f in "${L2_FILES[@]}"; do
         MAPPINGS+=(
-            "L2/${f}.md|.kiro/steering/${f}.md|L2→kiro/steering/${f}.md"
-            "L2/${f}.md|.cursor/rules/${f}.md|L2→cursor/rules/${f}.md"
-            "L2/${f}.md|.claude/memories/${f}.md|L2→claude/memories/${f}.md"
-            "L2/${f}.md|.continue/rules/${f}.md|L2→continue/rules/${f}.md"
-            "L2/${f}.md|.windsurf/rules/${f}.md|L2→windsurf/rules/${f}.md"
+            "L2#Index/${f}.md|.kiro/steering/${f}.md|L2#Index→kiro/steering/${f}.md"
+            "L2#Index/${f}.md|.cursor/rules/${f}.md|L2#Index→cursor/rules/${f}.md"
+            "L2#Index/${f}.md|.claude/memories/${f}.md|L2#Index→claude/memories/${f}.md"
+            "L2#Index/${f}.md|.continue/rules/${f}.md|L2#Index→continue/rules/${f}.md"
+            "L2#Index/${f}.md|.windsurf/rules/${f}.md|L2#Index→windsurf/rules/${f}.md"
         )
     done
 
-    # L3 精炼规范 → 各工具的 rules 目录（整目录链接）
-    # 注意：ZERO 是通用框架，L3 内容较少，可以整目录链接
-    # 如果项目使用 ZERO 后 L3 内容很多，建议改为逐文件链接
+    # L3#完整规范 (Standards) → 各工具的按需规则目录（整目录链接）
     MAPPINGS+=(
-        "L3|.cursor/condensed|L3→cursor/condensed"
-        "L3|.claude/condensed|L3→claude/condensed"
-        "L3|.windsurf/condensed|L3→windsurf/condensed"
-        "L3|.continue/condensed|L3→continue/condensed"
+        "L3#Standards/standards|.cursor/rules/zero-standards|L3#Standards→cursor/rules/zero-standards"
+        "L3#Standards/standards|.claude/memories/zero-standards|L3#Standards→claude/memories/zero-standards"
+        "L3#Standards/standards|.windsurf/rules/zero-standards|L3#Standards→windsurf/rules/zero-standards"
+        "L3#Standards/standards|.continue/rules/zero-standards|L3#Standards→continue/rules/zero-standards"
     )
 }
 
@@ -158,10 +156,10 @@ remove_all_mappings() {
     # 检查各 IDE 目录中是否有非链接的意外文件
     local check_dirs=(
         ".kiro/steering"
-        ".cursor/rules" ".cursor/condensed"
-        ".claude/memories" ".claude/condensed"
-        ".windsurf/rules" ".windsurf/condensed"
-        ".continue/rules" ".continue/condensed"
+        ".cursor/rules"
+        ".claude/memories"
+        ".windsurf/rules"
+        ".continue/rules"
     )
 
     for dir in "${check_dirs[@]}"; do
@@ -207,10 +205,10 @@ show_menu() {
     echo ""
     echo -e "${YELLOW}映射目标：${NC}"
     echo "  a. Kiro        (AGENTS.md + .kiro/steering)"
-    echo "  b. Cursor      (.cursorrules + .cursor/rules + .cursor/condensed)"
-    echo "  c. Claude Code (CLAUDE.md + .claude/memories + .claude/condensed)"
-    echo "  d. Windsurf    (.windsurfrules + .windsurf/rules + .windsurf/condensed)"
-    echo "  e. Continue    (.continue/rules + .continue/condensed)"
+    echo "  b. Cursor      (.cursorrules + .cursor/rules)"
+    echo "  c. Claude Code (CLAUDE.md + .claude/memories)"
+    echo "  d. Windsurf    (.windsurfrules + .windsurf/rules)"
+    echo "  e. Continue    (.continue/rules)"
     echo ""
     echo "  f. 映射到所有工具"
     echo "  g. 移除所有映射（并检查非链接文件）"

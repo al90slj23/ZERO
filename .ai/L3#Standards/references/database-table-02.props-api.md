@@ -1,6 +1,6 @@
 # database-table-02.props-api.md - Props 配置与后端 API
 
-> **版本**: 1.0.0  
+> **版本**: 1.0.0
 > **创建时间**: 2025-12-31
 
 ---
@@ -13,49 +13,49 @@
 interface DatabaseTableProps {
   /** 数据库表名（必填） */
   table: string;
-  
+
   /** 表格标签名称（可选，默认从表注释获取） */
   tableLabel?: string;
-  
+
   /** 是否显示搜索栏（默认 true） */
   showSearch?: boolean;
-  
+
   /** 是否显示新增按钮（默认 true） */
   showAddButton?: boolean;
-  
+
   /** 是否显示分页器（默认 true） */
   showPagination?: boolean;
-  
+
   /** 是否显示操作列（默认 true） */
   showOperations?: boolean;
-  
+
   /** 是否显示列设置按钮（默认 true） */
   showColumnSettings?: boolean;
-  
+
   /** 是否显示列宽设置按钮（默认 true） */
   showColumnWidthSettings?: boolean;
-  
+
   /** 是否显示导出按钮（默认 true） */
   showExport?: boolean;
-  
+
   /** 是否显示历史按钮（默认 true） */
   showHistory?: boolean;
-  
+
   /** 是否显示刷新按钮（默认 true） */
   showRefresh?: boolean;
-  
+
   /** 隐藏的列名数组 */
   hiddenColumns?: string[];
-  
+
   /** 额外的列配置 */
   extraColumns?: any[];
-  
+
   /** 默认查询参数 */
   defaultParams?: Record<string, any>;
-  
+
   /** 默认每页条数（默认 20） */
   defaultPageSize?: number;
-  
+
   /** 自定义操作按钮 */
   customActions?: CustomAction[];
 }
@@ -67,10 +67,10 @@ interface DatabaseTableProps {
 interface ExtensionTableConfig {
   /** 扩展表名 */
   name: string;
-  
+
   /** 扩展表显示名称（可选，从数据库表注释自动获取） */
   label?: string;
-  
+
   /** 外键字段名（关联主表的字段） */
   foreignKey: string;
 }
@@ -115,7 +115,7 @@ import DatabaseTable from '@/components/Common/DatabaseTable.vue';
     <template #toolbar-prepend>
       <t-button @click="handleBatchImport">批量导入</t-button>
     </template>
-    
+
     <!-- 工具栏后置插槽 -->
     <template #toolbar-append>
       <t-button @click="handleExportAll">导出全部</t-button>

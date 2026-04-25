@@ -8,7 +8,7 @@
 
 **平台无关源文件 + 符号链接映射**：
 
-1. **源文件直接放在 `.ai/L0/skills/{name}/`**
+1. **源文件直接放在 `.ai/L0#Execution/skills/{name}/`**
    - 不套 `kiro/` 等平台子目录
    - 每个 skill 一个独立目录
 

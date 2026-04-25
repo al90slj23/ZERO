@@ -7,7 +7,7 @@
 ## 目录结构
 
 ```
-.ai/L0/workflows/
+.ai/L0#Execution/workflows/
 ├── README.md          # 本文档
 ├── github/            # GitHub Actions 工作流
 │   └── *.yml
@@ -67,28 +67,28 @@
 ### GitHub Actions
 ```bash
 # 1. 创建工作流文件
-touch .ai/L0/workflows/github/my-workflow.yml
+touch .ai/L0#Execution/workflows/github/my-workflow.yml
 
 # 2. 编写配置
-vim .ai/L0/workflows/github/my-workflow.yml
+vim .ai/L0#Execution/workflows/github/my-workflow.yml
 
 # 3. 复制到 GitHub Actions 目录
-cp .ai/L0/workflows/github/my-workflow.yml .github/workflows/
+cp .ai/L0#Execution/workflows/github/my-workflow.yml .github/workflows/
 ```
 
 ### 本地脚本
 ```bash
 # 1. 创建脚本
-touch .ai/L0/workflows/local/my-script.sh
+touch .ai/L0#Execution/workflows/local/my-script.sh
 
 # 2. 编写脚本
-vim .ai/L0/workflows/local/my-script.sh
+vim .ai/L0#Execution/workflows/local/my-script.sh
 
 # 3. 设置可执行权限
-chmod +x .ai/L0/workflows/local/my-script.sh
+chmod +x .ai/L0#Execution/workflows/local/my-script.sh
 
 # 4. 执行
-.ai/L0/workflows/local/my-script.sh
+.ai/L0#Execution/workflows/local/my-script.sh
 ```
 
 ---

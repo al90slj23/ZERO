@@ -1,6 +1,6 @@
 # database-table-08.history.md - 操作历史功能
 
-> **版本**: 1.0.0  
+> **版本**: 1.0.0
 > **创建时间**: 2025-12-31
 
 ---
@@ -53,7 +53,7 @@
 ## 3. 历史记录类型
 
 ```typescript
-type OperationType = 
+type OperationType =
   | 'create'           // 新增
   | 'update'           // 编辑
   | 'delete'           // 删除
@@ -216,7 +216,7 @@ const handleRollback = async (record: OperationHistory) => {
     MessagePlugin.warning('该记录不支持回滚');
     return;
   }
-  
+
   rollingBackId.value = record.id;
   try {
     // 触发回滚事件，由父组件处理

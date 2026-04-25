@@ -1,6 +1,6 @@
 # database-table-06.cell-edit.md - 单元格交互规范（ZERO 新增）
 
-> **版本**: 1.0.0  
+> **版本**: 1.0.0
 > **创建时间**: 2025-12-31
 
 ---
@@ -78,7 +78,7 @@ const handleCellDblClick = (row: any, col: any, rowIndex: number) => {
   if (['id', 'created_at', 'updated_at', 'deleted_at'].includes(col.colKey)) {
     return;
   }
-  
+
   editState.value = {
     rowIndex,
     colKey: col.colKey,
@@ -90,20 +90,20 @@ const handleCellDblClick = (row: any, col: any, rowIndex: number) => {
 // 确认编辑
 const handleCellEditConfirm = async () => {
   if (!editState.value) return;
-  
+
   const { rowIndex, colKey, originalValue, currentValue } = editState.value;
-  
+
   // 值未变化，直接退出
   if (originalValue === currentValue) {
     editState.value = null;
     return;
   }
-  
+
   // 调用更新 API
   await updateRecord(tableData.value[rowIndex].id, {
     [colKey]: currentValue,
   });
-  
+
   // 更新本地数据
   tableData.value[rowIndex][colKey] = currentValue;
   editState.value = null;

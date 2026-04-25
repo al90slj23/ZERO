@@ -9,9 +9,9 @@
 **平台无关源文件 + 符号链接映射**：
 
 1. **源文件直接放在 L0 子目录**：
-   - Hook 配置：`.ai/L0/hooks/*.json`（不套 `kiro/` 等平台子目录）
-   - Skill 文档：`.ai/L0/skills/{name}/SKILL.md`
-   - Spec 文档：`.ai/L0/specs/{status}/{feature}/`
+   - Hook 配置：`.ai/L0#Execution/hooks/*.json`（不套 `kiro/` 等平台子目录）
+   - Skill 文档：`.ai/L0#Execution/skills/{name}/SKILL.md`
+   - Spec 文档：`.ai/L0#Execution/specs/{status}/{feature}/`
 
 2. **通过符号链接映射到各 IDE**：
    - 运行 `./gogogo.sh 8a` 映射到 Kiro
@@ -20,14 +20,14 @@
 
 3. **禁止直接修改映射目标**：
    - `.kiro/hooks/`、`.kiro/skills/` 等是只读映射目标
-   - 所有修改都在 `.ai/L0/` 进行
+   - 所有修改都在 `.ai/L0#Execution/` 进行
 
 ---
 
 ## 目录结构
 
 ```
-.ai/L0/
+.ai/L0#Execution/
 ├── README.md          # 本文档
 ├── specs/             # 功能规格（→ .kiro/specs/）
 │   ├── README.md      # Specs 目录说明
@@ -80,9 +80,9 @@
 ## 注意事项
 
 1. **永远不要直接修改映射目标**（如 `.kiro/hooks/`、`.kiro/skills/`）
-2. **所有修改都在 `.ai/L0/` 进行**，符号链接自动生效
+2. **所有修改都在 `.ai/L0#Execution/` 进行**，符号链接自动生效
 3. **新增 hook 文件后运行 `./gogogo.sh 8a`** 重新映射
-4. **Skills 同理**：直接在 `.ai/L0/skills/{name}/` 创建，不套平台子目录
+4. **Skills 同理**：直接在 `.ai/L0#Execution/skills/{name}/` 创建，不套平台子目录
 
 ---
 

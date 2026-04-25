@@ -1,6 +1,6 @@
 # database-table-03.column-header.md - 表格列头规范
 
-> **版本**: 1.0.0  
+> **版本**: 1.0.0
 > **创建时间**: 2025-12-31
 
 ---
@@ -35,11 +35,11 @@
 ```typescript
 const parseColumnComment = (comment: string) => {
   if (!comment) return { displayName: '', helpText: '', displayOrder: 999 };
-  
+
   // 兼容全角竖线
   const normalized = comment.replace(/｜/g, '|');
   const parts = normalized.split('|');
-  
+
   return {
     displayOrder: parseInt(parts[0]) || 999,  // 第1段：排序
     category: parts[1] || '',                  // 第2段：分类
@@ -101,18 +101,18 @@ const renderColumnTitle = (
   display: flex;
   align-items: center;
   gap: 6px;
-  
+
   .help-icon {
     font-size: 14px;
     color: var(--td-text-color-placeholder);
     cursor: help;
     flex-shrink: 0;
-    
+
     &:hover {
       color: var(--td-brand-color);
     }
   }
-  
+
   .display-name {
     font-size: 13px;
     font-weight: 500;
@@ -126,7 +126,7 @@ const renderColumnTitle = (
     color: #fff;
     font-family: 'Monaco', 'Courier New', monospace;
   }
-  
+
   .field-comment {
     color: rgba(255, 255, 255, 0.85);
     font-size: 12px;

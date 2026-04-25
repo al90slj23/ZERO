@@ -36,7 +36,7 @@ API路径：/api/admin/users/config/levels
 3. **行业通用 > 项目特定** - 使用行业公认术语，避免自创缩写
 4. **精准语义 > 模糊简称** - `processUserRegistration()` 而非 `process()`
 
-详见：[04.quality-00.naming-philosophy.md](../.ai/L3#Standards/standards/04.quality-00.naming-philosophy.md)
+详见：[04.quality-00.naming-philosophy.md](../L3#Standards/standards/04.quality-00.naming-philosophy.md)
 
 ---
 
@@ -183,7 +183,7 @@ php artisan view:fix        # 自动修复不一致
 - Redis 缓存 + 1 小时 TTL
 - 自动同步命令保持文件系统与数据库一致
 
-详见：[02.backend-04.db-manifest.md](../.ai/L3#Standards/standards/02.backend-04.db-manifest.md)
+详见：[02.backend-04.db-manifest.md](../L3#Standards/standards/02.backend-04.db-manifest.md)
 
 ### 侧边栏菜单
 
@@ -201,7 +201,7 @@ php artisan view:fix        # 自动修复不一致
 
 **无硬编码默认值**：没有就是 null，前端根据 null 显示警告状态。
 
-详见：[05.biz-01.menu.md](../.ai/L3#Standards/standards/05.biz-01.menu.md)
+详见：[05.biz-01.menu.md](../L3#Standards/standards/05.biz-01.menu.md)
 
 ### 表命名
 
@@ -300,7 +300,7 @@ FeatureName.FileType.ext
 
 **函数/方法**：推荐 10-40 行，上限 80 行
 
-详见：[06.quality-01.size.md](../.ai/L3#Standards/standards/06.quality-01.size.md)
+详见：[06.quality-01.size.md](../L3#Standards/standards/06.quality-01.size.md)
 
 ---
 
@@ -330,7 +330,7 @@ FeatureName.FileType.ext
 | 修复 | `fix/<问题描述>` |
 | 发布 | `release/<版本号>` |
 
-详见：[06.quality-02.git.md](../.ai/L3#Standards/standards/06.quality-02.git.md)
+详见：[06.quality-02.git.md](../L3#Standards/standards/06.quality-02.git.md)
 
 ---
 
@@ -352,7 +352,7 @@ FeatureName.FileType.ext
 - 提供解决方案
 - 不暴露敏感信息
 
-详见：[06.quality-03.error.md](../.ai/L3#Standards/standards/06.quality-03.error.md)
+详见：[06.quality-03.error.md](../L3#Standards/standards/06.quality-03.error.md)
 
 ---
 
@@ -374,7 +374,7 @@ FeatureName.FileType.ext
 - 修改代码 → 更新注释
 - 新增函数 → 更新【主要函数】
 
-详见：[06.quality-04.header.md](../.ai/L3#Standards/standards/06.quality-04.header.md)
+详见：[06.quality-04.header.md](../L3#Standards/standards/06.quality-04.header.md)
 
 ---
 
@@ -410,7 +410,7 @@ gogogo.2.sh        # 选项 2: 检查状态
 ...
 ```
 
-详见：[09.tool-01.gogogo-sh.md](../.ai/L3#Standards/standards/09.tool-01.gogogo-sh.md)
+详见：[09.tool-01.gogogo-sh.md](../L3#Standards/standards/09.tool-01.gogogo-sh.md)
 
 ---
 
@@ -426,13 +426,13 @@ gogogo.2.sh        # 选项 2: 检查状态
    - **源文件直接放在 L0#工作执行 (Execution) 子目录**：`.ai/L0#Execution/hooks/*.json`、`.ai/L0#Execution/skills/{name}/`（不套 `kiro/` 等平台子目录）
    - **通过符号链接映射到各 IDE**：运行 `./gogogo.sh 8a` 或 `./gogogo.sh 8f`
    - **禁止直接修改映射目标**：`.kiro/hooks/`、`.kiro/skills/` 等是只读映射目标
-   - 详见：[.ai/L0#Execution/README.md](../.ai/L0#Execution/README.md)
+   - 详见：[.ai/L0#Execution/README.md](../L0#Execution/README.md)
 8. **规范变更必须执行冲突检测**（开发方法论级）
    - 有 hook 能力的 IDE（Kiro、Claude Code）→ 自动触发
    - 无 hook 能力的环境（Cursor、CLI）→ 手动执行
    - 四步检测：L3#完整规范 (Standards) 内部冲突 → L2#规范索引 (Index)-L3#完整规范 (Standards) 一致性 → L2#规范索引 (Index) 索引 → L1#项目概览 (Overview) 宪法级
    - 逐步纯化历史文档，确保规范长期一致性
-   - 详见：[09.tool-04.hooks.md](../.ai/L3#Standards/standards/09.tool-04.hooks.md)
+   - 详见：[09.tool-04.hooks.md](../L3#Standards/standards/09.tool-04.hooks.md)
 9. **六层架构文件夹必须使用 `L#英文名/` 格式**（如 `.ai/L0#Execution/`）
 10. **六层架构文档引用必须使用中英文混合格式**（如 `L0#工作执行 (Execution)`）
 
@@ -450,4 +450,4 @@ const name = config?.shortName || folderName
 
 ---
 
-**最后更新**：2026-04-16
+**最后更新**：2026-04-26

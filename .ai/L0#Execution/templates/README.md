@@ -28,17 +28,17 @@
 
 #### workflow-template.yml
 - **用途**：创建新的 CI/CD 工作流
-- **使用**：复制到 `.ai/L0/workflows/`，配置流程
+- **使用**：复制到 `.ai/L0#Execution/workflows/`，配置流程
 
 ## 使用方法
 
 ### 创建新钩子
 ```bash
 # 1. 复制模板
-cp .ai/L0/templates/hook-template.json .ai/L0/hooks/my-new-hook.json
+cp .ai/L0#Execution/templates/hook-template.json .ai/L0#Execution/hooks/my-new-hook.json
 
 # 2. 编辑配置
-vim .ai/L0/hooks/my-new-hook.json
+vim .ai/L0#Execution/hooks/my-new-hook.json
 
 # 3. 映射到 Kiro
 ./gogogo.sh 8a
@@ -47,22 +47,22 @@ vim .ai/L0/hooks/my-new-hook.json
 ### 创建新 Spec
 ```bash
 # 1. 创建目录
-mkdir -p .ai/L0/specs/backlog/my-feature
+mkdir -p .ai/L0#Execution/specs/backlog/my-feature
 
 # 2. 复制模板
-cp .ai/L0/templates/spec-template.md .ai/L0/specs/backlog/my-feature/00.spec-01.requirements.md
+cp .ai/L0#Execution/templates/spec-template.md .ai/L0#Execution/specs/backlog/my-feature/00.spec-01.requirements.md
 
 # 3. 编写需求
-vim .ai/L0/specs/backlog/my-feature/00.spec-01.requirements.md
+vim .ai/L0#Execution/specs/backlog/my-feature/00.spec-01.requirements.md
 ```
 
 ### 创建新工作流
 ```bash
 # 1. 复制模板
-cp .ai/L0/templates/workflow-template.yml .ai/L0/workflows/github/my-workflow.yml
+cp .ai/L0#Execution/templates/workflow-template.yml .ai/L0#Execution/workflows/github/my-workflow.yml
 
 # 2. 配置流程
-vim .ai/L0/workflows/github/my-workflow.yml
+vim .ai/L0#Execution/workflows/github/my-workflow.yml
 ```
 
 ## 模板维护

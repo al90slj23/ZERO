@@ -5,7 +5,7 @@
 ## 目录结构
 
 ```
-.ai/L0/hooks/
+.ai/L0#Execution/hooks/
 ├── README.md                           ← 本文件
 ├── standards-sync-on-complete.json     ← 规范同步检查（推荐）
 ├── husky/                              ← Git hooks（通过 Husky）
@@ -13,13 +13,13 @@
 ```
 
 **架构说明**：
-- Hook 配置文件（`.json`）直接存放在 `.ai/L0/hooks/` 目录下
+- Hook 配置文件（`.json`）直接存放在 `.ai/L0#Execution/hooks/` 目录下
 - 各 IDE/平台通过符号链接映射到自己的目录，并转换格式
-- 例如：`.ai/L0/hooks/standards-sync-on-complete.json` → `.kiro/hooks/standards-sync-on-complete.kiro.hook`
+- 例如：`.ai/L0#Execution/hooks/standards-sync-on-complete.json` → `.kiro/hooks/standards-sync-on-complete.kiro.hook`
 
 ## 核心原则
 
-1. **源文件在 L0** - `.ai/L0/hooks/` 是唯一可编辑位置
+1. **源文件在 L0** - `.ai/L0#Execution/hooks/` 是唯一可编辑位置
 2. **映射到 IDE** - 通过 `gogogo.sh 8a` 映射到 `.kiro/hooks/`
 3. **文件格式** - Kiro hooks 使用 `.json` 格式，映射后自动变成 `.kiro.hook`
 4. **必须字段** - `enabled: true` 是必须的，否则 Kiro 不显示该 hook
@@ -48,15 +48,15 @@ Hook 自动触发
     ↓
 第一步：判断是否涉及规范变更
     ↓
-第二步：冲突检测（L4→L3→L2→L1）
+第二步：冲突检测（L3→L2→L1）
     ↓
 第三步：用户确认后执行同步
 ```
 
 **冲突检测四步骤**：
-1. **L4 内部冲突检测** - 找出同层不同文件的矛盾
-2. **L3 与 L4 一致性检测** - 确保精炼版与完整版一致
-3. **L2 与 L3 一致性检测** - 确保索引覆盖所有主题
+1. **L3#完整规范 (Standards) 内部冲突检测** - 找出同层不同文件的矛盾
+2. **L2#规范索引 (Index) 与 L3#完整规范 (Standards) 一致性检测** - 确保索引覆盖所有主题
+3. **IDE 映射与 L2#规范索引 (Index) 一致性检测** - 确保自动载入内容没有过期
 4. **L1 宪法级检测** - 判断是否需要写入零容忍规则
 
 ### 2. 提交前类型检查（可选）
@@ -100,12 +100,12 @@ Hook 自动触发
 
 ```bash
 # 复制 ZERO 的 hook 示例到项目
-cp -r ZERO/.ai-example/L0/hooks/ .ai/L0/hooks/
+cp -r ZERO/.ai/L0#Execution/hooks/ .ai/L0#Execution/hooks/
 ```
 
 ### 2. 根据需要调整
 
-编辑 `.ai/L0/hooks/*.json` 文件，调整配置。
+编辑 `.ai/L0#Execution/hooks/*.json` 文件，调整配置。
 
 ### 3. 映射到 Kiro
 
@@ -125,7 +125,7 @@ ls -la .kiro/hooks/
 
 ### 1. 规范同步 Hook 是必需的
 
-对于使用七层架构的项目，**强烈建议启用规范同步 Hook**：
+对于使用六层架构的项目，**强烈建议启用规范同步 Hook**：
 - ✅ 防止规范不一致
 - ✅ 自动检测冲突
 - ✅ 逐步纯化历史文档
@@ -146,7 +146,7 @@ ls -la .kiro/hooks/
 ## 注意事项
 
 1. **不要直接修改 `.kiro/hooks/`**
-   - 所有修改都在 `.ai/L0/hooks/` 进行
+   - 所有修改都在 `.ai/L0#Execution/hooks/` 进行
    - 运行 `./gogogo.sh 8a` 自动同步
 
 2. **`enabled: true` 是必须的**
@@ -154,8 +154,8 @@ ls -la .kiro/hooks/
 
 3. **Hook 文件名要清晰**
    - 使用描述性名称
-   - 直接放在 `.ai/L0/hooks/` 目录下
-   - 例如：`.ai/L0/hooks/standards-sync-on-complete.json`
+   - 直接放在 `.ai/L0#Execution/hooks/` 目录下
+   - 例如：`.ai/L0#Execution/hooks/standards-sync-on-complete.json`
 
 4. **测试 Hook 配置**
    - 创建后先测试是否正常触发
@@ -163,8 +163,8 @@ ls -la .kiro/hooks/
 
 ## 相关文档
 
-- `ZERO/.ai/L4/standards/09.tool-04.hooks.md` - Kiro Hooks 完整规范
-- `ZERO/.ai/L4/standards/10.ai-memory-01.architecture.md` - 七层架构说明
+- `ZERO/.ai/L3#Standards/standards/09.tool-04.hooks.md` - Kiro Hooks 完整规范
+- `ZERO/.ai/L3#Standards/standards/10.ai-memory-01.architecture.md` - 六层架构说明
 
 ---
 

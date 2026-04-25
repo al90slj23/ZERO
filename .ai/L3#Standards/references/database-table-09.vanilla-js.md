@@ -1,7 +1,7 @@
 # database-table-09.vanilla-js - Vanilla JS 表格组件
 
-> **版本**: 1.0.0  
-> **创建时间**: 2025-12-31  
+> **版本**: 1.0.0
+> **创建时间**: 2025-12-31
 > **基于**: M.SRL 项目 DbTable 组件
 
 ---
@@ -245,13 +245,13 @@ if (typeof initUsers === 'function') {
 DbTable.prototype.handleCopy = function(row) {
     // 1. 复制选中行的所有数据
     var copyData = Object.assign({}, row);
-    
+
     // 2. 删除不应复制的字段
     delete copyData.id;           // 删除主键 ID
     delete copyData.created_at;   // 删除创建时间
     delete copyData.updated_at;   // 删除更新时间
     delete copyData.deleted_at;   // 删除软删除时间
-    
+
     // 3. 以"新建"模式打开表单，预填充复制的数据
     this.openEditDialog(null, copyData);
 };
@@ -481,32 +481,32 @@ function handleList($input) {
     $sort = $input['sort'] ?? 'id';
     $order = strtoupper($input['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
     $search = $input['search'] ?? '';
-    
+
     // 白名单验证排序字段
     $allowedSorts = ['id', 'name', 'email', 'status', 'created_at'];
     if (!in_array($sort, $allowedSorts)) {
         $sort = 'id';
     }
-    
+
     $where = '1=1';
     $params = [];
-    
+
     if ($search) {
         $where .= ' AND (name LIKE ? OR email LIKE ?)';
         $params = ["%$search%", "%$search%"];
     }
-    
+
     // 获取总数
     $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE $where");
     $stmt->execute($params);
     $total = $stmt->fetchColumn();
-    
+
     // 获取数据
     $offset = ($page - 1) * $pageSize;
     $stmt = $db->prepare("SELECT * FROM users WHERE $where ORDER BY $sort $order LIMIT $offset, $pageSize");
     $stmt->execute($params);
     $list = $stmt->fetchAll();
-    
+
     echo json_encode([
         'code' => 200,
         'data' => [

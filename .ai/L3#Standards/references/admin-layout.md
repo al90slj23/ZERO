@@ -92,7 +92,7 @@ logout()              // 退出登录
 ## B区：智能动态侧边栏（多层级）
 
 > **核心特性**：自动扫描文件系统 + `xxx_manifest_list` 表配置合并 + **无限层级递归渲染**
-> 
+>
 > **关联文档**：
 > - `02.backend-04.db-manifest` - 数据表结构
 > - `05.biz-01.menu` - 菜单生成逻辑
@@ -166,17 +166,17 @@ interface MenuItem {
   url: string              // 访问 URL
   folderName: string       // 目录名（始终保留）
   level: number            // 层级深度（1, 2, 3...）
-  
+
   // 数据库来源（可能为 null）
   shortName: string | null // 显示名称
   icon: string | null      // 图标
   color: string | null     // 颜色
   sortOrder: number | null // 排序
-  
+
   // 状态标记
   hasDbRecord: boolean     // 是否有数据库记录
   warnings: Warning[]      // 警告列表
-  
+
   // 🔑 子菜单（递归结构）
   children?: MenuItem[]    // 子菜单数组，支持无限嵌套
 }
@@ -217,13 +217,13 @@ function expandParentMenus(routePath: string) {
       <Icon :name="displayIcon" />
       <span class="menu-item-name">{{ displayName }}</span>
       <!-- 展开/收缩箭头（有子菜单时显示） -->
-      <Icon 
-        v-if="hasChildren" 
-        :name="isExpanded ? 'chevron-down' : 'chevron-right'" 
+      <Icon
+        v-if="hasChildren"
+        :name="isExpanded ? 'chevron-down' : 'chevron-right'"
         class="expand-icon"
       />
     </div>
-    
+
     <!-- 🔑 递归渲染子菜单 -->
     <div v-if="hasChildren && isExpanded" class="menu-children">
       <MenuItemRenderer
@@ -256,9 +256,9 @@ const displayName = item.shortName || item.folderName
 const displayIcon = item.icon || 'help-circle'
 
 // 警告状态
-const warningClass = !item.hasDbRecord 
+const warningClass = !item.hasDbRecord
   ? 'menu-item--no-record'      // 红色警告
-  : item.warnings.length > 0 
+  : item.warnings.length > 0
     ? 'menu-item--incomplete'   // 黄色警告
     : ''                        // 正常
 ```
@@ -401,41 +401,41 @@ const pathCopyIcon = ref('file-copy')  // 复制图标状态
 
 /**
  * 复制面包屑路径（包含页面信息和URL）
- * 
+ *
  * 复制内容格式：
  * 页面:用户列表      路径:管理后台/用户管理/用户列表
  * https://example.com/admin/users/list
  */
 async function copyBreadcrumbPath() {
   copyingPath.value = true
-  
+
   try {
     // 获取当前页面名称（最后一级）
     const pageName = getCurrentPageName()
-    
+
     // 获取完整路径文本（用斜杠分隔）
     const pathText = breadcrumbs.value
       .map(item => item.title)
       .join('/')
-    
+
     // 获取当前完整 URL
     const currentUrl = window.location.href
-    
+
     // 组装复制内容
     const textToCopy = `页面:${pageName}      路径:${pathText}\n${currentUrl}`
-    
+
     // 写入剪贴板
     await navigator.clipboard.writeText(textToCopy)
-    
+
     // 显示成功状态（图标变为勾）
     pathCopyIcon.value = 'check'
     showMessage('路径已复制', 'success')
-    
+
     // 2秒后恢复图标
     setTimeout(() => {
       pathCopyIcon.value = 'file-copy'
     }, 2000)
-    
+
   } catch (err) {
     console.error('复制失败:', err)
     showMessage('复制失败，请手动复制', 'error')
@@ -470,7 +470,7 @@ const fullBreadcrumbTextWithSlashes = computed(() => {
       <span class="separator"></span>
       <span class="label">路径:</span>
       <span class="path-value">{{ fullBreadcrumbTextWithSlashes }}</span>
-      
+
       <!-- 🔑 复制按钮 -->
       <button
         class="copy-btn"
@@ -481,7 +481,7 @@ const fullBreadcrumbTextWithSlashes = computed(() => {
         <Icon :name="pathCopyIcon" />
       </button>
     </div>
-    
+
     <!-- 右侧：操作按钮 -->
     <div class="header-actions">
       <button @click="refreshContent" title="刷新">
@@ -532,30 +532,30 @@ const fullBreadcrumbTextWithSlashes = computed(() => {
 async function generateBreadcrumbs() {
   const pathSegments = route.path.split('/').filter(Boolean)
   const items: BreadcrumbItem[] = []
-  
+
   // 添加根节点
   items.push({
     title: '管理后台',
     path: '/admin',
     icon: 'dashboard'
   })
-  
+
   // 逐级构建路径并查询配置
   let currentPath = ''
   for (let i = 1; i < pathSegments.length; i++) {
     currentPath += `/${pathSegments[i]}`
     const fullPath = `/admin${currentPath}`
-    
+
     // 从 manifest_list 获取配置
     const config = await fetchPathConfig(fullPath)
-    
+
     items.push({
       title: config?.shortName || pathSegments[i],
       path: fullPath,
       icon: config?.icon
     })
   }
-  
+
   breadcrumbs.value = items
 }
 
@@ -668,7 +668,7 @@ layouts/
     <!-- 主体区域 -->
     <div class="area-main">
       <!-- B区：侧边栏 -->
-      <Sidebar 
+      <Sidebar
         class="area-b"
         @toggle-collapse="handleSidebarCollapse"
       />

@@ -1,6 +1,6 @@
 # database-table-04.table-interaction.md - 表格主体交互规范
 
-> **版本**: 1.0.0  
+> **版本**: 1.0.0
 > **创建时间**: 2025-12-31
 
 ---
@@ -128,7 +128,7 @@ const startDrag = (e: MouseEvent) => {
 const onDrag = (e: MouseEvent) => {
   if (!isDragging.value || !scrollContainer) return;
   e.preventDefault();
-  
+
   const deltaX = e.clientX - startX;
   const deltaY = e.clientY - startY;
   scrollContainer.scrollLeft = scrollLeft - deltaX;
@@ -180,13 +180,13 @@ const showStickyHeader = ref(false);
 const handleFormScroll = (e: Event) => {
   const container = e.target as HTMLElement;
   const scrollTop = container.scrollTop;
-  
+
   // 遍历所有表区块，找到当前可见的
   const sections = container.querySelectorAll('.table-section');
   for (const section of sections) {
     const rect = section.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
-    
+
     if (rect.top <= containerRect.top + 50 && rect.bottom > containerRect.top) {
       // 更新吸附表头信息
       currentStickyTable.value = {
@@ -198,7 +198,7 @@ const handleFormScroll = (e: Event) => {
       return;
     }
   }
-  
+
   showStickyHeader.value = false;
 };
 ```

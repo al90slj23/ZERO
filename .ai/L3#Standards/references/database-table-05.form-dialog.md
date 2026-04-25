@@ -1,6 +1,6 @@
 # database-table-05.form-dialog.md - 表单对话框规范
 
-> **版本**: 1.0.0  
+> **版本**: 1.0.0
 > **创建时间**: 2025-12-31
 
 ---
@@ -162,10 +162,10 @@ FormFieldConfig: {
 ```typescript
 const generateFormRules = (columns: ColumnInfo[]) => {
   const rules: Record<string, any[]> = {};
-  
+
   for (const col of columns) {
     const fieldRules = [];
-    
+
     // 必填验证
     if (!col.nullable && !col.autoIncrement) {
       fieldRules.push({
@@ -173,7 +173,7 @@ const generateFormRules = (columns: ColumnInfo[]) => {
         message: `${col.extra.displayName}不能为空`,
       });
     }
-    
+
     // 长度验证
     if (col.length && col.type.includes('varchar')) {
       fieldRules.push({
@@ -181,12 +181,12 @@ const generateFormRules = (columns: ColumnInfo[]) => {
         message: `${col.extra.displayName}最多${col.length}个字符`,
       });
     }
-    
+
     if (fieldRules.length > 0) {
       rules[col.name] = fieldRules;
     }
   }
-  
+
   return rules;
 };
 ```
@@ -241,7 +241,7 @@ interface ChangeItem {
 // 检测变更
 const detectChanges = (): ChangeItem[] => {
   const changes: ChangeItem[] = [];
-  
+
   // 检测主表变更
   if (mainTableEnabled.value && originalMainData.value) {
     for (const field of allMainFormFields.value) {
@@ -258,14 +258,14 @@ const detectChanges = (): ChangeItem[] => {
       }
     }
   }
-  
+
   // 检测扩展表变更
   for (const ext of extensionTablesList.value) {
     if (!ext.enabled) continue;
     const originalExt = originalExtensionData.value[ext.name];
     const currentExt = extensionFormData.value[ext.name];
     if (!originalExt || !currentExt) continue;
-    
+
     for (const field of ext.fields) {
       const oldVal = originalExt[field.field];
       const newVal = currentExt[field.field];
@@ -280,7 +280,7 @@ const detectChanges = (): ChangeItem[] => {
       }
     }
   }
-  
+
   return changes;
 };
 

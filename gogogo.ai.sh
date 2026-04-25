@@ -16,8 +16,11 @@ if [ -z "${SCRIPT_DIR:-}" ]; then
 fi
 
 AI_DIR="$SCRIPT_DIR/.ai"
-L2_DIR="$AI_DIR/L2"
-L5_DIR="$AI_DIR/L5"
+L0_DIR="$AI_DIR/L0#Execution"
+L1_DIR="$AI_DIR/L1#Overview"
+L2_DIR="$AI_DIR/L2#Index"
+L3_DIR="$AI_DIR/L3#Standards"
+L4_DIR="$AI_DIR/L4#Changelog"
 
 call_ai_api() {
 	local prompt="$1"
@@ -46,8 +49,8 @@ windsurf:$SCRIPT_DIR/.windsurf/rules
 trae:$SCRIPT_DIR/.trae/rules
 roo:$SCRIPT_DIR/.roo/rules"
 
-# L2 分类索引文件列表（逐文件链接到 .kiro/steering/，排除 README.md）
-L2_INDEX_FILES="00.meta 01.arch 02.backend 03.frontend 04.data 05.biz 06.quality 07.security 08.ops 09.tool 10.ref"
+# L2#规范索引 (Index) 文件列表（逐文件链接到各 IDE）
+L2_INDEX_FILES="README toc"
 
 # L1 概览文件映射（单文件链接）
 L1_OVERVIEW_TARGETS="AGENTS.md CLAUDE.md .cursorrules .windsurfrules"
@@ -62,38 +65,38 @@ create_ai_link() {
 	[ -L "$target" ] && rm "$target"
 	[ -d "$target" ] || mkdir -p "$target"
 	for f in $L2_INDEX_FILES; do
-		local src="$AI_DIR/L2/${f}.md"
+		local src="$L2_DIR/${f}.md"
 		local dst="$target/${f}.md"
 		[ -f "$src" ] || continue
 		[ -L "$dst" ] && rm "$dst"
 		ln -s "$src" "$dst"
 	done
-	echo -e "  ${GREEN}✅ $tool: 逐文件链接 → .ai/L2/ (${#L2_INDEX_FILES[@]} 文件)${NC}"
+	echo -e "  ${GREEN}✅ $tool: 逐文件链接 → .ai/L2#Index/ ($(echo "$L2_INDEX_FILES" | wc -w | tr -d ' ') 文件)${NC}"
 }
 
-# 创建 L1 概览文件链接
+# 创建 L1#项目概览 (Overview) 文件链接
 create_l1_links() {
-	local overview_file="$AI_DIR/L1/00.overview.md"
-	[ -f "$overview_file" ] || { echo -e "  ${RED}❌ L1/00.overview.md 不存在${NC}"; return 1; }
+	local overview_file="$L1_DIR/guide.md"
+	[ -f "$overview_file" ] || { echo -e "  ${RED}❌ L1#Overview/guide.md 不存在${NC}"; return 1; }
 	for target in $L1_OVERVIEW_TARGETS; do
 		local full_target="$SCRIPT_DIR/$target"
 		[ -L "$full_target" ] && rm "$full_target"
 		ln -s "$overview_file" "$full_target"
-		echo -e "  ${GREEN}✅ $target → .ai/L1/00.overview.md${NC}"
+		echo -e "  ${GREEN}✅ $target → .ai/L1#Overview/guide.md${NC}"
 	done
 }
 
-# 创建 L2 分类索引逐文件链接到 .kiro/steering/
+# 创建 L2#规范索引 (Index) 逐文件链接到 .kiro/steering/
 create_l2_steering_links() {
 	local steering_dir="$SCRIPT_DIR/.kiro/steering"
 	mkdir -p "$steering_dir"
 	for f in $L2_INDEX_FILES; do
-		local src="$AI_DIR/L2/${f}.md"
+		local src="$L2_DIR/${f}.md"
 		local dst="$steering_dir/${f}.md"
-		[ -f "$src" ] || { echo -e "  ${YELLOW}⚠️  .ai/L2/${f}.md 不存在，跳过${NC}"; continue; }
+		[ -f "$src" ] || { echo -e "  ${YELLOW}⚠️  .ai/L2#Index/${f}.md 不存在，跳过${NC}"; continue; }
 		[ -L "$dst" ] && rm "$dst"
 		ln -s "$src" "$dst"
-		echo -e "  ${GREEN}✅ .kiro/steering/${f}.md → .ai/L2/${f}.md${NC}"
+		echo -e "  ${GREEN}✅ .kiro/steering/${f}.md → .ai/L2#Index/${f}.md${NC}"
 	done
 }
 
@@ -115,8 +118,8 @@ rebuild_ai_link() {
 sync_kiro_specs() {
 	echo -e "${BLUE}📋 同步 Kiro specs...${NC}"
 	local kiro_specs_dir="$SCRIPT_DIR/.kiro/specs"
-	local active_dir="$AI_DIR/L3/active"
-	local completed_dir="$AI_DIR/L3/completed"
+	local active_dir="$L0_DIR/specs/active"
+	local completed_dir="$L0_DIR/specs/completed"
 	local found_specs=0
 	mkdir -p "$kiro_specs_dir"
 
@@ -148,7 +151,7 @@ sync_kiro_specs() {
 	done
 
 	if [ "$found_specs" -eq 0 ]; then
-		echo -e "  ${YELLOW}⚠️  无可同步的 L3 specs${NC}"
+		echo -e "  ${YELLOW}⚠️  无可同步的 L0#Execution specs${NC}"
 	fi
 }
 
@@ -175,26 +178,26 @@ verify_ai_links() {
 show_ai_status() {
 	echo -e "${BLUE}📊 当前状态${NC}"
 	echo ""
-	echo -e "  L0: $(ls "$AI_DIR/L0/"*.md 2>/dev/null | wc -l | tr -d ' ') 文件"
-	echo -e "  L1: $(ls "$AI_DIR/L1/"*.md 2>/dev/null | wc -l | tr -d ' ') 文件"
-	echo -e "  L2: $(ls "$AI_DIR/L2/"*.md 2>/dev/null | wc -l | tr -d ' ') 文件"
-	echo -e "  L3/active: $(ls -d "$AI_DIR/L3/active/"*/ 2>/dev/null | wc -l | tr -d ' ') 功能"
-	echo -e "  L3/completed: $(ls -d "$AI_DIR/L3/completed/"*/ 2>/dev/null | wc -l | tr -d ' ') 功能"
-	echo -e "  L4/standards: $(ls "$AI_DIR/L4/standards/"*.md 2>/dev/null | wc -l | tr -d ' ') 文件"
-	echo -e "  L5: $(find "$AI_DIR/L5" -name "*.md" 2>/dev/null | wc -l | tr -d ' ') 日志"
+	echo -e "  L0#Execution: $(find "$L0_DIR" -name "*.md" 2>/dev/null | wc -l | tr -d ' ') 文件"
+	echo -e "  L1#Overview: $(ls "$L1_DIR/"*.md 2>/dev/null | wc -l | tr -d ' ') 文件"
+	echo -e "  L2#Index: $(ls "$L2_DIR/"*.md 2>/dev/null | wc -l | tr -d ' ') 文件"
+	echo -e "  L0#Execution/specs/active: $(ls -d "$L0_DIR/specs/active/"*/ 2>/dev/null | wc -l | tr -d ' ') 功能"
+	echo -e "  L0#Execution/specs/completed: $(ls -d "$L0_DIR/specs/completed/"*/ 2>/dev/null | wc -l | tr -d ' ') 功能"
+	echo -e "  L3#Standards/standards: $(ls "$L3_DIR/standards/"*.md 2>/dev/null | wc -l | tr -d ' ') 文件"
+	echo -e "  L4#Changelog: $(find "$L4_DIR" -name "*.md" 2>/dev/null | wc -l | tr -d ' ') 日志"
 	echo ""
 	verify_ai_links
 }
 
-write_l5_log() {
-	echo -e "${BLUE}📝 写入 L5 操作日志${NC}"
+write_l4_log() {
+	echo -e "${BLUE}📝 写入 L4#操作日志 (Changelog)${NC}"
 	local log_date
 	log_date="$(date +%Y-%m-%d)"
 	local year
 	year="$(date +%Y)"
 	local month
 	month="$(date +%m)"
-	local target_dir="$L5_DIR/$year/$month"
+	local target_dir="$L4_DIR/$year/$month"
 	mkdir -p "$target_dir"
 
 	echo "请选择日志类型："
@@ -251,7 +254,7 @@ write_l5_log() {
 ${log_body}
 EOF
 
-	echo -e "${GREEN}✅ L5 日志已写入: ${log_file#$SCRIPT_DIR/}${NC}"
+	echo -e "${GREEN}✅ L4#Changelog 日志已写入: ${log_file#$SCRIPT_DIR/}${NC}"
 }
 
 run_ai_manager_menu() {
@@ -261,10 +264,10 @@ run_ai_manager_menu() {
 	echo ""
 
 	echo -e "${YELLOW}请选择操作：${NC}"
-	echo "1. 初始化/重建所有链接（L1+L2+L3）"
+	echo "1. 初始化/重建所有链接（L1#Overview + L2#Index）"
 	echo "2. 检查 AI 体系状态"
-	echo "3. 同步 Kiro specs（L0→.kiro/specs/）"
-	echo "4. 写入 L5 操作日志"
+	echo "3. 同步 Kiro specs（L0#Execution→.kiro/specs/）"
+	echo "4. 写入 L4#操作日志 (Changelog)"
 	echo "0. 返回"
 	echo ""
 	read -p "请输入选择: " ai_choice
@@ -274,13 +277,12 @@ run_ai_manager_menu() {
 	1)
 		echo -e "${GREEN}🔗 建立所有链接...${NC}"
 		echo ""
-		echo -e "${BLUE}L1 概览文件链接：${NC}"
+		echo -e "${BLUE}L1#项目概览 (Overview) 文件链接：${NC}"
 		create_l1_links
 		echo ""
-		echo -e "${BLUE}L2 分类索引链接（→ .kiro/steering/）：${NC}"
+		echo -e "${BLUE}L2#规范索引 (Index) 链接（→ .kiro/steering/）：${NC}"
 		create_l2_steering_links
 		echo ""
-		echo -e "${BLUE}L3 精炼规范链接（→ rules 目录）：${NC}"
 		each_ai_link create_ai_link
 		echo ""
 		sync_kiro_specs
@@ -292,7 +294,7 @@ run_ai_manager_menu() {
 		sync_kiro_specs
 		;;
 	4)
-		write_l5_log
+		write_l4_log
 		;;
 	0)
 		echo -e "${GREEN}👋 返回主菜单${NC}"

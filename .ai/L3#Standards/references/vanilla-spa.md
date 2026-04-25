@@ -83,7 +83,7 @@ admin/
             <div class="logo">Logo</div>
             <div class="user-info">用户信息</div>
         </header>
-        
+
         <!-- 主体区域 -->
         <div class="area-main">
             <!-- B区：侧边栏 -->
@@ -92,7 +92,7 @@ admin/
                     <!-- 由 JS 动态渲染 -->
                 </nav>
             </aside>
-            
+
             <!-- CD区域容器 -->
             <div class="area-cd">
                 <!-- C区：页面头部 -->
@@ -104,7 +104,7 @@ admin/
                         <button onclick="location.reload()">刷新</button>
                     </div>
                 </div>
-                
+
                 <!-- D区：主内容区 🔑 -->
                 <main class="area-d" id="mainContent">
                     <!-- 由 SPA 路由动态加载 -->
@@ -112,7 +112,7 @@ admin/
             </div>
         </div>
     </div>
-    
+
     <script src="/admin/layout.js"></script>
 </body>
 </html>
@@ -207,11 +207,11 @@ window._menuData = null;
 function urlToFilePath(urlPath) {
     // 移除前缀和尾部斜杠
     const parts = urlPath.replace(/^\/admin\/?/, '').replace(/\/$/, '').split('/').filter(Boolean);
-    
+
     if (parts.length === 0) {
         return 'admin/';
     }
-    
+
     // URL 小写 -> 目录名映射（首字母大写）
     const dirMap = {
         'users': 'Users',
@@ -219,7 +219,7 @@ function urlToFilePath(urlPath) {
         'orders': 'Orders'
         // ... 根据项目添加
     };
-    
+
     const fileParts = parts.map(p => dirMap[p.toLowerCase()] || capitalize(p));
     return 'admin/' + fileParts.join('/') + '/';
 }
@@ -238,24 +238,24 @@ function capitalize(str) {
 async function loadContent() {
     const contentEl = document.getElementById('mainContent');
     if (!contentEl) return;
-    
+
     // 显示加载状态
     contentEl.innerHTML = '<div class="loading">加载中...</div>';
-    
+
     // 获取内容文件路径
     const filePath = urlToFilePath(currentPath);
     const contentUrl = '/' + filePath + 'content.html';
-    
+
     try {
         const resp = await fetch(contentUrl);
-        
+
         if (resp.ok) {
             const html = await resp.text();
             contentEl.innerHTML = html;
-            
+
             // 🔑 执行动态加载的脚本
             executeScripts(contentEl);
-            
+
             // 更新页面标题
             updatePageTitle();
         } else {
@@ -266,7 +266,7 @@ async function loadContent() {
         console.error('加载内容失败:', e);
         contentEl.innerHTML = '<div class="error">加载失败</div>';
     }
-    
+
     // 重新初始化图标（如 Lucide）
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
@@ -286,15 +286,15 @@ function executeScripts(container) {
     const scripts = container.querySelectorAll('script');
     scripts.forEach(oldScript => {
         const newScript = document.createElement('script');
-        
+
         // 复制属性
         Array.from(oldScript.attributes).forEach(attr => {
             newScript.setAttribute(attr.name, attr.value);
         });
-        
+
         // 复制内容
         newScript.textContent = oldScript.textContent;
-        
+
         // 替换脚本（触发执行）
         oldScript.parentNode.replaceChild(newScript, oldScript);
     });
@@ -314,26 +314,26 @@ async function navigateTo(url, pushState = true) {
         window.location.href = url;
         return;
     }
-    
+
     const path = url.split('?')[0];
-    
+
     // 相同路径不处理
     if (path === currentPath) return;
-    
+
     // 更新当前路径
     currentPath = path;
-    
+
     // 更新浏览器 URL（不刷新页面）
     if (pushState) {
         history.pushState({ path }, '', url);
     }
-    
+
     // 更新 C 区面包屑
     updateBreadcrumb();
-    
+
     // 更新 B 区菜单高亮
     updateMenuHighlight();
-    
+
     // 加载 D 区域内容
     await loadContent();
 }
@@ -349,10 +349,10 @@ function setupLinkInterception() {
     document.addEventListener('click', (e) => {
         const link = e.target.closest('a');
         if (!link) return;
-        
+
         const href = link.getAttribute('href');
         if (!href) return;
-        
+
         // 只拦截管理后台路径
         if (href.startsWith('/admin')) {
             e.preventDefault();
@@ -391,17 +391,17 @@ async function initLayout() {
         renderSidebar(menuData);
         window._menuData = menuData;
     }
-    
+
     // 生成面包屑
     updateBreadcrumb();
-    
+
     // 加载 D 区域内容
     await loadContent();
-    
+
     // 设置 SPA 路由
     setupLinkInterception();
     setupPopState();
-    
+
     // 保存初始状态
     history.replaceState({ path: currentPath }, '', window.location.href);
 }
@@ -421,13 +421,13 @@ server {
     listen 80;
     server_name example.com;
     root /var/www/html;
-    
+
     # 管理后台 SPA 路由
     location /admin {
         # 如果请求的是静态文件，直接返回
         try_files $uri $uri/ /admin/index.html;
     }
-    
+
     # 或者更精确的配置
     location ~ ^/admin(?!/.*\.(css|js|png|jpg|svg|html|php)).*$ {
         rewrite ^/admin.*$ /admin/index.html last;
@@ -537,17 +537,17 @@ server {
 function renderSidebar(menuData) {
     const container = document.getElementById('sidebarMenu');
     if (!container || !menuData?.menu) return;
-    
+
     // 构建树形结构
     const tree = buildMenuTree(menuData.menu);
-    
+
     // 清空并渲染
     container.innerHTML = '';
     tree.forEach(item => {
         const node = createMenuNode(item, 1);
         container.appendChild(node);
     });
-    
+
     // 展开当前路由的父级
     expandParentMenus();
 }
@@ -560,24 +560,24 @@ function createMenuNode(item, level) {
     node.className = 'menu-node';
     node.dataset.level = level;
     node.dataset.key = item.path;
-    
+
     // 菜单项内容
     const content = document.createElement('div');
     content.className = 'menu-item-content';
     content.style.paddingLeft = `${(level - 1) * 16 + 12}px`;
-    
+
     // 图标 + 文字
     content.innerHTML = `
         <i data-lucide="${item.icon || 'folder'}"></i>
         <span class="menu-text">${item.shortName || item.folderName}</span>
         ${item.children?.length ? '<i data-lucide="chevron-right" class="expand-icon"></i>' : ''}
     `;
-    
+
     // 高亮当前页
     if (item.url === currentPath) {
         content.classList.add('active');
     }
-    
+
     // 点击事件
     content.addEventListener('click', (e) => {
         e.preventDefault();
@@ -587,21 +587,21 @@ function createMenuNode(item, level) {
             navigateTo(item.url);
         }
     });
-    
+
     node.appendChild(content);
-    
+
     // 递归渲染子菜单
     if (item.children?.length) {
         const childrenContainer = document.createElement('div');
         childrenContainer.className = 'menu-children';
-        
+
         item.children.forEach(child => {
             childrenContainer.appendChild(createMenuNode(child, level + 1));
         });
-        
+
         node.appendChild(childrenContainer);
     }
-    
+
     return node;
 }
 ```
@@ -663,17 +663,17 @@ if (typeof lucide !== 'undefined') {
 ```javascript
 function executeScripts(container) {
     const scripts = Array.from(container.querySelectorAll('script'));
-    
+
     // 分离外部脚本和内联脚本
     const externalScripts = scripts.filter(s => s.src);
     const inlineScripts = scripts.filter(s => !s.src);
-    
+
     // 移除原始脚本标签
     scripts.forEach(s => s.remove());
-    
+
     // 加载外部脚本（按顺序）
     let loadPromise = Promise.resolve();
-    
+
     externalScripts.forEach(oldScript => {
         loadPromise = loadPromise.then(() => {
             return new Promise((resolve) => {
@@ -689,7 +689,7 @@ function executeScripts(container) {
             });
         });
     });
-    
+
     // 外部脚本加载完成后执行内联脚本
     loadPromise.then(() => {
         inlineScripts.forEach(oldScript => {

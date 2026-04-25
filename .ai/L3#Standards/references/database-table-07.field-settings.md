@@ -1,6 +1,6 @@
 # database-table-07.field-settings.md - 字段设置功能（含注释编辑）
 
-> **版本**: 1.0.0  
+> **版本**: 1.0.0
 > **创建时间**: 2025-12-31
 
 ---
@@ -129,7 +129,7 @@ Content-Type: application/json
       "comment": "1|基础|用户姓名|用户的显示名称|1"
     },
     {
-      "name": "email", 
+      "name": "email",
       "comment": "3|基础|邮箱|用于登录和通知|1"
     }
   ]
@@ -143,12 +143,12 @@ public function updateComments(Request $request): JsonResponse
 {
     $table = $request->input('table');
     $columns = $request->input('columns', []);
-    
+
     foreach ($columns as $col) {
         $sql = "ALTER TABLE `{$table}` MODIFY COLUMN `{$col['name']}` ... COMMENT '{$col['comment']}'";
         DB::statement($sql);
     }
-    
+
     return response()->json(['success' => true]);
 }
 ```

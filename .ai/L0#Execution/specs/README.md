@@ -7,7 +7,7 @@
 ## 目录结构
 
 ```
-.ai/L0/specs/
+.ai/L0#Execution/specs/
 ├── README.md          # 本文档
 ├── active/            # 进行中的功能
 │   └── {feature}/     # 功能目录
@@ -64,16 +64,16 @@
 
 ```bash
 # 1. 创建功能目录
-mkdir -p .ai/L0/specs/backlog/my-feature
+mkdir -p .ai/L0#Execution/specs/backlog/my-feature
 
 # 2. 复制模板（如果有）
-cp .ai/L0/templates/spec-template.md .ai/L0/specs/backlog/my-feature/00.spec-01.requirements.md
+cp .ai/L0#Execution/templates/spec-template.md .ai/L0#Execution/specs/backlog/my-feature/00.spec-01.requirements.md
 
 # 3. 编写需求
-vim .ai/L0/specs/backlog/my-feature/00.spec-01.requirements.md
+vim .ai/L0#Execution/specs/backlog/my-feature/00.spec-01.requirements.md
 
 # 4. 移动到 active（开始开发时）
-mv .ai/L0/specs/backlog/my-feature .ai/L0/specs/active/
+mv .ai/L0#Execution/specs/backlog/my-feature .ai/L0#Execution/specs/active/
 
 # 5. 映射到 Kiro
 ./gogogo.sh 8a
@@ -98,7 +98,7 @@ completed/        → 归档阶段
 1. **功能目录命名**：使用小写字母和连字符（如 `user-auth`）
 2. **保持 4 个标准文件**：即使某些文件暂时为空
 3. **及时更新状态**：完成后移动到 `completed/`
-4. **不要直接修改 `.kiro/specs/`**：所有修改在 `.ai/L0/specs/` 进行
+4. **不要直接修改 `.kiro/specs/`**：所有修改在 `.ai/L0#Execution/specs/` 进行
 
 ---
 

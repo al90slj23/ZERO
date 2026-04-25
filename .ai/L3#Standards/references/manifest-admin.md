@@ -99,7 +99,7 @@ async function loadHierarchyData() {
     fetch('/api/v1/admin/files/scan-directory?path=resources/js/views'),
     fetch('/api/v1/admin/xxx/manifest-list?per_page=1000')
   ])
-  
+
   // 2. 将数据库配置转换为以 path 为 key 的 Map
   const manifestConfig = new Map()
   manifestData.forEach(item => {
@@ -107,13 +107,13 @@ async function loadHierarchyData() {
       manifestConfig.set(item.path, item)
     }
   })
-  
+
   // 3. 合并文件系统结构和数据库配置
   const enrichedTree = enrichTreeWithManifestConfig(
     fileSystemResult.structure.children,
     manifestConfig
   )
-  
+
   // 4. 计算统计信息
   calculateHierarchyStats(enrichedTree)
 }
@@ -124,7 +124,7 @@ async function loadHierarchyData() {
 ```typescript
 /**
  * 合并文件系统结构和数据库配置
- * 
+ *
  * 核心逻辑：
  * 1. 只保留目录节点（过滤文件）
  * 2. 尝试多种路径格式匹配数据库配置
@@ -132,15 +132,15 @@ async function loadHierarchyData() {
  * 4. 按 sortOrder 排序
  */
 function enrichTreeWithManifestConfig(
-  tree: FileNode[], 
+  tree: FileNode[],
   manifestConfig: Map<string, ManifestItem>
 ): EnrichedNode[] {
-  
+
   return tree
     .filter(node => node.type === 'directory')  // 只保留目录
     .map(node => {
       const enrichedNode = { ...node }
-      
+
       // 路径匹配策略（按优先级）
       const pathVariants = [
         '/' + node.path + '/',           // /resources/js/views/admin/users/
@@ -148,7 +148,7 @@ function enrichTreeWithManifestConfig(
         node.path + '/',                 // resources/js/views/admin/users/
         node.path                        // resources/js/views/admin/users
       ]
-      
+
       let matchedConfig = null
       for (const pathVariant of pathVariants) {
         if (manifestConfig.has(pathVariant)) {
@@ -156,7 +156,7 @@ function enrichTreeWithManifestConfig(
           break
         }
       }
-      
+
       if (matchedConfig) {
         // 有数据库配置
         enrichedNode.manifestConfig = matchedConfig
@@ -172,12 +172,12 @@ function enrichTreeWithManifestConfig(
         enrichedNode.isWarning = pathDepth > 3  // 只对深层目录显示警告
         enrichedNode.warningText = '未在数据库中配置'
       }
-      
+
       // 递归处理子节点
       if (node.children?.length > 0) {
         enrichedNode.children = enrichTreeWithManifestConfig(node.children, manifestConfig)
       }
-      
+
       return enrichedNode
     })
     .sort((a, b) => {
@@ -204,12 +204,12 @@ function enrichTreeWithManifestConfig(
         <Icon :name="isExpanded ? 'chevron-down' : 'chevron-right'" />
       </div>
       <div v-else class="expand-placeholder"></div>
-      
+
       <!-- 节点图标 -->
       <div class="node-icon">
         <Icon :name="displayIcon" :style="iconStyle" />
       </div>
-      
+
       <!-- 节点信息 -->
       <div class="node-info">
         <div class="node-name">
@@ -222,7 +222,7 @@ function enrichTreeWithManifestConfig(
         </div>
         <div class="node-path">{{ node.path }}</div>
       </div>
-      
+
       <!-- 编辑按钮 -->
       <div class="node-actions">
         <Button variant="text" size="small" @click.stop="handleEdit">
@@ -230,7 +230,7 @@ function enrichTreeWithManifestConfig(
         </Button>
       </div>
     </div>
-    
+
     <!-- 🔑 递归渲染子节点 -->
     <div v-if="isExpanded && hasChildren" class="children-container">
       <ManifestTreeNode
@@ -295,14 +295,14 @@ onMounted(() => {
 ```typescript
 /**
  * 处理节点编辑
- * 
+ *
  * 两种场景：
  * 1. 已有配置 → 编辑现有记录
  * 2. 未配置 → 创建新记录（自动填充默认值）
  */
 function handleNodeEdit(node: EnrichedNode) {
   let editData: ManifestEditData
-  
+
   if (node.hasConfig && node.manifestConfig) {
     // 编辑现有配置
     editData = {
@@ -320,7 +320,7 @@ function handleNodeEdit(node: EnrichedNode) {
   } else {
     // 创建新配置 - 自动推导字段值
     const normalizedPath = ensureLeadingSlash(node.path) + '/'
-    
+
     editData = {
       path: normalizedPath,
       vuePageComponent: normalizedPath + 'index.vue',
@@ -334,7 +334,7 @@ function handleNodeEdit(node: EnrichedNode) {
       status: 'development'
     }
   }
-  
+
   // 打开编辑弹窗
   openEditDialog(editData)
 }
@@ -364,23 +364,23 @@ function calculateHierarchyStats(tree: EnrichedNode[]): HierarchyStats {
   let totalDirectories = 0
   let configuredPages = 0
   let maxDepth = 0
-  
+
   const traverse = (nodes: EnrichedNode[], depth = 1) => {
     nodes.forEach(node => {
       if (node.type === 'directory') {
         totalDirectories++
         if (node.hasConfig) configuredPages++
         maxDepth = Math.max(maxDepth, depth)
-        
+
         if (node.children?.length > 0) {
           traverse(node.children, depth + 1)
         }
       }
     })
   }
-  
+
   traverse(tree)
-  
+
   return { totalFiles: 0, totalDirectories, maxDepth, configuredPages }
 }
 ```
@@ -398,7 +398,7 @@ function calculateHierarchyStats(tree: EnrichedNode[]): HierarchyStats {
       background-color: rgba(250, 173, 20, 0.1);
       border-left: 3px solid #faad14;
     }
-    
+
     .warning-icon {
       color: #faad14;
     }
@@ -425,7 +425,7 @@ function calculateHierarchyStats(tree: EnrichedNode[]): HierarchyStats {
   padding: 8px 12px;
   cursor: pointer;
   transition: background-color 0.2s;
-  
+
   &:hover {
     background-color: var(--hover-bg-color);
   }

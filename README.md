@@ -1,7 +1,8 @@
 # ZERO - PathKing
 
 > **定位**：以文件夹路径为唯一主体的命名规范框架（路径为王）
-> **版本**：v1.0.0
+> **版本**：v2.0.0（六层架构）
+> **更新日期**：2026-04-26
 > **适用场景**：任意技术栈的 Web 项目
 
 ---
@@ -35,7 +36,7 @@ API路径：/api/admin/users/config/levels
 3. **行业通用 > 项目特定** - 使用行业公认术语，避免自创缩写
 4. **精准语义 > 模糊简称** - `processUserRegistration()` 而非 `process()`
 
-详见：[04.quality-00.naming-philosophy.md](.ai/L4/standards/04.quality-00.naming-philosophy.md)
+详见：[04.quality-00.naming-philosophy.md](.ai/L3#Standards/standards/04.quality-00.naming-philosophy.md)
 
 ---
 
@@ -52,34 +53,23 @@ ZERO/
 ├── gogogo.2.sh                         # 选项 2: 检查状态
 ├── gogogo.3.sh                         # 选项 3: 清缓存
 ├── gogogo.ai.sh                        # 选项 ai: AI 记忆体系管理
-└── .ai/                                # 📋 AI 记忆体系（七层架构）
-    ├── L0/                             # 项目进度管理
+└── .ai/                                # 📋 AI 记忆体系（六层架构）
+    ├── L0#Execution/                   # 工作执行
     │   ├── hooks/                      # IDE 和 Git 钩子
     │   ├── skills/                     # AI 技能文档
     │   ├── specs/                      # 功能规格
     │   ├── templates/                  # 模板文件
     │   └── workflows/                  # 工作流配置
     │
-    ├── L1/                             # 概览文档
+    ├── L1#Overview/                    # 项目概览
     │   ├── README.md                   # 文件夹说明
     │   └── guide.md                    # 项目概览（主文件）
     │
-    ├── L2/                             # 分类索引
+    ├── L2#Index/                       # 规范索引
     │   ├── README.md                   # 文件夹说明
     │   └── toc.md                      # 文档目录（主文件）
     │
-    ├── L3/                             # 精炼规范（100-150行/文件）
-    │   ├── 00.meta-01.core.md         # 元规范
-    │   ├── 01.arch-01.core.md         # 核心架构
-    │   ├── 02.backend-*.md            # 后端规范
-    │   ├── 03.frontend-*.md           # 前端规范
-    │   ├── 04.quality-*.md            # 质量规范
-    │   ├── 05.biz-*.md                # 业务规范
-    │   ├── 06.quality-*.md            # 质量规范
-    │   ├── 09.tool-*.md               # 工具规范
-    │   └── 10.ai-memory-*.md          # AI 记忆体系
-    │
-    ├── L4/                             # 完整规范
+    ├── L3#Standards/                   # 完整规范
     │   ├── standards/                  # 框架基础规范
     │   │   ├── 00.meta-01.core.md     # 元规范
     │   │   ├── 01.arch-*.md           # 架构规范
@@ -101,10 +91,10 @@ ZERO/
     │       ├── README.md              # 灵感来源说明
     │       └── ECC/                   # Everything Claude Code
     │
-    ├── L5/                             # 操作日志
+    ├── L4#Changelog/                   # 操作日志
     │   └── README.md                   # 工作日志说明
     │
-    └── L6/                             # 知识图谱（可选）
+    └── L5#Knowledge/                   # 知识图谱（可选）
         └── README.md                   # 知识图谱说明
 ```
 
@@ -116,22 +106,22 @@ ZERO/
 
 如果你的项目使用了 ZERO 框架，以下是关键的使用指南：
 
-#### 1. L0 目录 - 项目进度管理（重要！）
+#### 1. L0#工作执行 (Execution) 目录（重要）
 
-`.ai/L0/` 是你管理项目 hooks、skills、specs 的地方。
+`.ai/L0#Execution/` 是你管理项目 hooks、skills、specs 的地方。
 
 **核心原则（零容忍）**：
-- ✅ **源文件直接放在 L0 子目录**：`.ai/L0/hooks/*.json`、`.ai/L0/skills/{name}/`
+- ✅ **源文件直接放在 L0#工作执行 (Execution) 子目录**：`.ai/L0#Execution/hooks/*.json`、`.ai/L0#Execution/skills/{name}/`
 - ✅ **通过符号链接映射到 IDE**：运行 `./gogogo.sh 8a`（Kiro）或 `./gogogo.sh 8f`（所有工具）
 - ❌ **禁止直接修改映射目标**：`.kiro/hooks/`、`.kiro/skills/` 等是只读
 
 **创建新 Hook**：
 ```bash
-# 1. 在 L0 创建源文件
-touch .ai/L0/hooks/my-hook.json
+# 1. 在 L0#工作执行 (Execution) 创建源文件
+touch .ai/L0#Execution/hooks/my-hook.json
 
 # 2. 编辑配置（必须包含 "enabled": true）
-vim .ai/L0/hooks/my-hook.json
+vim .ai/L0#Execution/hooks/my-hook.json
 
 # 3. 映射到 Kiro
 ./gogogo.sh 8a
@@ -143,10 +133,10 @@ ls -la .kiro/hooks/my-hook.kiro.hook
 **创建新 Skill**：
 ```bash
 # 1. 创建 skill 目录
-mkdir -p .ai/L0/skills/my-skill
+mkdir -p .ai/L0#Execution/skills/my-skill
 
 # 2. 创建 SKILL.md（必须包含 frontmatter）
-vim .ai/L0/skills/my-skill/SKILL.md
+vim .ai/L0#Execution/skills/my-skill/SKILL.md
 
 # 3. 映射到 Kiro
 ./gogogo.sh 8a
@@ -156,21 +146,22 @@ ls -la .kiro/skills/my-skill/SKILL.md
 ```
 
 **详细说明**：
-- Hooks：查看 [.ai/L0/hooks/README.md](.ai/L0/hooks/README.md)
-- Skills：查看 [.ai/L0/skills/README.md](.ai/L0/skills/README.md)
-- Specs：查看 [.ai/L0/specs/README.md](.ai/L0/specs/README.md)
-- Workflows：查看 [.ai/L0/workflows/README.md](.ai/L0/workflows/README.md)
+- Hooks：查看 [.ai/L0#Execution/hooks/README.md](.ai/L0#Execution/hooks/README.md)
+- Skills：查看 [.ai/L0#Execution/skills/README.md](.ai/L0#Execution/skills/README.md)
+- Specs：查看 [.ai/L0#Execution/specs/README.md](.ai/L0#Execution/specs/README.md)
+- Workflows：查看 [.ai/L0#Execution/workflows/README.md](.ai/L0#Execution/workflows/README.md)
 
 #### 2. 规范文档查阅顺序
 
 ```
-L1（零容忍规则）→ L2（分类索引）→ L3（精炼规范）→ L4（完整规范）
+L1#项目概览 (Overview) → L2#规范索引 (Index) → L3#完整规范 (Standards) → L5#知识图谱 (Knowledge) → L4#操作日志 (Changelog)
 ```
 
-- **L1**：[.ai/L1/guide.md](.ai/L1/guide.md) - 项目概览和零容忍规则
-- **L2**：[.ai/L2/toc.md](.ai/L2/toc.md) - 按主题分类的索引
-- **L3**：精炼规范（100-150行/文件，AI 优先读取）
-- **L4**：完整规范（详细说明，人类阅读）
+- **L1#项目概览 (Overview)**：[.ai/L1#Overview/guide.md](.ai/L1#Overview/guide.md) - 项目概览和零容忍规则
+- **L2#规范索引 (Index)**：[.ai/L2#Index/toc.md](.ai/L2#Index/toc.md) - 按主题分类的索引
+- **L3#完整规范 (Standards)**：[.ai/L3#Standards/standards/](.ai/L3#Standards/standards/) - 当前唯一规范主版本
+- **L5#知识图谱 (Knowledge)**：[.ai/L5#Knowledge/](.ai/L5#Knowledge/) - 知识沉淀和语义关系
+- **L4#操作日志 (Changelog)**：[.ai/L4#Changelog/](.ai/L4#Changelog/) - 历史追溯
 
 #### 3. gogogo.sh 常用命令
 
@@ -244,7 +235,7 @@ php artisan view:fix        # 自动修复不一致
 - Redis 缓存 + 1 小时 TTL
 - 自动同步命令保持文件系统与数据库一致
 
-详见：[02.backend-04.db-manifest.md](.ai/L4/standards/02.backend-04.db-manifest.md)
+详见：[02.backend-04.db-manifest.md](.ai/L3#Standards/standards/02.backend-04.db-manifest.md)
 
 ### 侧边栏菜单
 
@@ -262,11 +253,11 @@ php artisan view:fix        # 自动修复不一致
 
 **无硬编码默认值**：没有就是 null，前端根据 null 显示警告状态。
 
-详见：[05.biz-01.menu.md](.ai/L4/standards/05.biz-01.menu.md)
+详见：[05.biz-01.menu.md](.ai/L3#Standards/standards/05.biz-01.menu.md)
 
 ### 迁移指南
 
-从旧版 `rules/` 目录结构迁移到新版 `.ai/` 七层架构，详见：[migration-guide-v2.md](.ai/L4/references/migration-guide-v2.md)
+从旧版 `rules/` 目录结构迁移到新版 `.ai/` 六层架构，详见：[migration-guide-v2.md](.ai/L3#Standards/references/migration-guide-v2.md)
 
 ### 表命名
 
@@ -365,7 +356,7 @@ FeatureName.FileType.ext
 
 **函数/方法**：推荐 10-40 行，上限 80 行
 
-详见：[06.quality-01.size.md](.ai/L4/standards/06.quality-01.size.md)
+详见：[06.quality-01.size.md](.ai/L3#Standards/standards/06.quality-01.size.md)
 
 ---
 
@@ -395,7 +386,7 @@ FeatureName.FileType.ext
 | 修复 | `fix/<问题描述>` |
 | 发布 | `release/<版本号>` |
 
-详见：[06.quality-02.git.md](.ai/L4/standards/06.quality-02.git.md)
+详见：[06.quality-02.git.md](.ai/L3#Standards/standards/06.quality-02.git.md)
 
 ---
 
@@ -417,7 +408,7 @@ FeatureName.FileType.ext
 - 提供解决方案
 - 不暴露敏感信息
 
-详见：[06.quality-03.error.md](.ai/L4/standards/06.quality-03.error.md)
+详见：[06.quality-03.error.md](.ai/L3#Standards/standards/06.quality-03.error.md)
 
 ---
 
@@ -439,7 +430,7 @@ FeatureName.FileType.ext
 - 修改代码 → 更新注释
 - 新增函数 → 更新【主要函数】
 
-详见：[06.quality-04.header.md](.ai/L4/standards/06.quality-04.header.md)
+详见：[06.quality-04.header.md](.ai/L3#Standards/standards/06.quality-04.header.md)
 
 ---
 
@@ -475,7 +466,7 @@ gogogo.2.sh        # 选项 2: 检查状态
 ...
 ```
 
-详见：[09.tool-01.gogogo-sh.md](.ai/L4/standards/09.tool-01.gogogo-sh.md)
+详见：[09.tool-01.gogogo-sh.md](.ai/L3#Standards/standards/09.tool-01.gogogo-sh.md)
 
 ---
 
@@ -486,18 +477,18 @@ gogogo.2.sh        # 选项 2: 检查状态
 3. **文件超800行必须拆分**
 4. **数据库通用语义后缀用单数**
 5. **L0 架构原则**（平台无关源文件 + 符号链接映射）⭐
-   - **源文件直接放在 L0 子目录**：`.ai/L0/hooks/*.json`、`.ai/L0/skills/{name}/`（不套 `kiro/` 等平台子目录）
+   - **源文件直接放在 L0 子目录**：`.ai/L0#Execution/hooks/*.json`、`.ai/L0#Execution/skills/{name}/`（不套 `kiro/` 等平台子目录）
    - **通过符号链接映射到各 IDE**：运行 `./gogogo.sh 8a` 或 `./gogogo.sh 8f`
    - **禁止直接修改映射目标**：`.kiro/hooks/`、`.kiro/skills/` 等是只读映射目标
-   - 详见：[.ai/L0/README.md](.ai/L0/README.md)
+   - 详见：[.ai/L0#Execution/README.md](.ai/L0#Execution/README.md)
 6. **修改代码必须同步更新文件头注释**
 7. **Commit 必须符合格式规范**
 8. **规范变更必须执行冲突检测**（开发方法论级）
    - 有 hook 能力的 IDE（Kiro、Claude Code）→ 自动触发
    - 无 hook 能力的环境（Cursor、CLI）→ 手动执行
-   - 四步检测：L4 内部冲突 → L3-L4 一致性 → L2 索引 → L1 宪法级
+   - 四步检测：L3#完整规范 (Standards) 内部冲突 → L2#规范索引 (Index) 一致性 → L1#项目概览 (Overview) 宪法级
    - 逐步纯化历史文档，确保规范长期一致性
-   - 详见：[09.tool-04.hooks.md](.ai/L4/standards/09.tool-04.hooks.md)
+   - 详见：[09.tool-04.hooks.md](.ai/L3#Standards/standards/09.tool-04.hooks.md)
 
 ---
 
