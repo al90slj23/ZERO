@@ -82,6 +82,21 @@ API路径：/api/admin/users/config/levels
 权限标识：admin.users.config.levels
 ```
 
+#### AI 友好命名
+
+- **命名哲学**：`04.quality-00.naming-philosophy.md`
+  - 完整描述 > 缩写简写
+  - AI 友好 > 人类打字方便
+  - 行业通用 > 项目特定
+  - 精准语义 > 模糊简称
+
+- **AI 友好命名扩展规范**：`04.quality-02.ai-friendly-naming.md`
+  - 长度不是成本，40-60 字符的完整命名是默认
+  - 结构要素不允许省略（主体 + 子能力 + 角色层 + 扩展名）
+  - 平铺优先，结构靠命名而非目录
+  - 抽象化模糊词禁用（`util`、`helper`、`manager` 等单独使用）
+  - 缩写白名单收敛到行业标准
+
 ### 🤖 对 AI 的友好性
 
 - ✅ 简洁的目录结构便于 LLM 理解

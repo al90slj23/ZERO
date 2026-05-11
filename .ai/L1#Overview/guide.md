@@ -35,8 +35,12 @@ API路径：/api/admin/users/config/levels
 2. **AI 友好 > 人类打字方便** - 命名可以长，但必须精准
 3. **行业通用 > 项目特定** - 使用行业公认术语，避免自创缩写
 4. **精准语义 > 模糊简称** - `processUserRegistration()` 而非 `process()`
+5. **长度不是成本** - 40-60 字符的完整命名是默认，绝不为简短而损失语义
+6. **结构靠命名而非目录** - 同领域文件默认平铺，通过 `FeatureName.layer.ext` 区分，不用子目录替代命名
 
-详见：[04.quality-00.naming-philosophy.md](../L3#Standards/standards/04.quality-00.naming-philosophy.md)
+详见：
+- [04.quality-00.naming-philosophy.md](../L3#Standards/standards/04.quality-00.naming-philosophy.md)
+- [04.quality-02.ai-friendly-naming.md](../L3#Standards/standards/04.quality-02.ai-friendly-naming.md)
 
 ---
 
@@ -422,19 +426,21 @@ gogogo.2.sh        # 选项 2: 检查状态
 4. **数据库通用语义后缀用单数**
 5. **修改代码必须同步更新文件头注释**
 6. **Commit 必须符合格式规范**
-7. **L0#工作执行 (Execution) 架构原则**（平台无关源文件 + 符号链接映射）
+7. **命名长度不是成本**：完整描述 > 缩写，AI 友好 > 人类打字方便，详见 [04.quality-02.ai-friendly-naming.md](../L3#Standards/standards/04.quality-02.ai-friendly-naming.md)
+8. **结构靠命名而非目录**：同领域文件默认平铺，用 `FeatureName.layer.ext` 区分，不用子目录替代命名
+9. **L0#工作执行 (Execution) 架构原则**（平台无关源文件 + 符号链接映射）
    - **源文件直接放在 L0#工作执行 (Execution) 子目录**：`.ai/L0#Execution/hooks/*.json`、`.ai/L0#Execution/skills/{name}/`（不套 `kiro/` 等平台子目录）
    - **通过符号链接映射到各 IDE**：运行 `./gogogo.sh 8a` 或 `./gogogo.sh 8f`
    - **禁止直接修改映射目标**：`.kiro/hooks/`、`.kiro/skills/` 等是只读映射目标
    - 详见：[.ai/L0#Execution/README.md](../L0#Execution/README.md)
-8. **规范变更必须执行冲突检测**（开发方法论级）
-   - 有 hook 能力的 IDE（Kiro、Claude Code）→ 自动触发
-   - 无 hook 能力的环境（Cursor、CLI）→ 手动执行
-   - 四步检测：L3#完整规范 (Standards) 内部冲突 → L2#规范索引 (Index)-L3#完整规范 (Standards) 一致性 → L2#规范索引 (Index) 索引 → L1#项目概览 (Overview) 宪法级
-   - 逐步纯化历史文档，确保规范长期一致性
-   - 详见：[09.tool-04.hooks.md](../L3#Standards/standards/09.tool-04.hooks.md)
-9. **六层架构文件夹必须使用 `L#英文名/` 格式**（如 `.ai/L0#Execution/`）
-10. **六层架构文档引用必须使用中英文混合格式**（如 `L0#工作执行 (Execution)`）
+10. **规范变更必须执行冲突检测**（开发方法论级）
+    - 有 hook 能力的 IDE（Kiro、Claude Code）→ 自动触发
+    - 无 hook 能力的环境（Cursor、CLI）→ 手动执行
+    - 四步检测：L3#完整规范 (Standards) 内部冲突 → L2#规范索引 (Index)-L3#完整规范 (Standards) 一致性 → L2#规范索引 (Index) 索引 → L1#项目概览 (Overview) 宪法级
+    - 逐步纯化历史文档，确保规范长期一致性
+    - 详见：[09.tool-04.hooks.md](../L3#Standards/standards/09.tool-04.hooks.md)
+11. **六层架构文件夹必须使用 `L#英文名/` 格式**（如 `.ai/L0#Execution/`）
+12. **六层架构文档引用必须使用中英文混合格式**（如 `L0#工作执行 (Execution)`）
 
 ---
 
