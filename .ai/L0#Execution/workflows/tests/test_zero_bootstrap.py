@@ -95,7 +95,7 @@ class BootstrapTests(unittest.TestCase):
             path.write_text("excluded source material")
         source_before = inventory(self.source)
         state = self.prepared()
-        self.assertEqual(state["zero_version"], "2.1.1")
+        self.assertEqual(state["zero_version"], "2.1.2")
         self.assertFalse(state["runtime_ready"])
         self.assertTrue(state["project_adaptation_pending"])
         self.assertIsNone(state["backup"])
@@ -105,6 +105,8 @@ class BootstrapTests(unittest.TestCase):
         self.assertFalse((self.target / ".ai/L4#Changelog/old-history.md").exists())
         self.assertFalse((self.target / ".ai/L5#Knowledge/.generated").exists())
         self.assertEqual((self.target / ".ai/L5#Knowledge/.gitignore").read_text(), ".generated/\n")
+        self.assertEqual((self.target / LOCAL / "retrieval-state.py").read_bytes(),
+                         (self.source / LOCAL / "retrieval-state.py").read_bytes())
         guide = (self.target / ".ai/L1#Overview/guide.md").read_text()
         self.assertIn("zero-project-facts.md", guide)
         self.assertIn("zero-template-guide.md", guide)
@@ -265,6 +267,30 @@ class BootstrapTests(unittest.TestCase):
         (bins / "codegraph").symlink_to("../@colbymchenry/codegraph/bin/codegraph")
         self.prepared()
         self.assertTrue((bins / "qmd").is_symlink())
+
+    def test_generated_entry_bounds_retrieval_and_reuses_project_rules(self):
+        original = "# Existing project rules\nHost evidence and project ownership remain required.\n"
+        self.write("AGENTS.md", original)
+        self.prepared()
+        agents = (self.target / "AGENTS.md").read_text()
+        self.assertTrue(agents.startswith(original))
+        for policy in ("exact path/symbol", "scoped QMD lex", "maxFiles 3",
+                       "40-80 lines", "current unchanged excerpts", "at most one targeted retry",
+                       "once from the project root at task completion", "Read-only tasks",
+                       "first introduction remains pending", "host and data-boundary verification"):
+            self.assertIn(policy, agents)
+        self.assertEqual(self.prepared()["changed_files"], 0)
+        self.assertEqual((self.target / "AGENTS.md").read_text(), agents)
+
+    def test_differing_runtime_state_helper_is_preserved_and_reported(self):
+        self.prepared()
+        helper = self.target / LOCAL / "retrieval-state.py"
+        helper.write_text(helper.read_text() + "\n# Existing project-specific runtime change\n")
+        before = inventory(self.target)
+        result = self.run_cli("--prepare-only")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Required runtime file differs", result.stderr)
+        self.assertEqual(inventory(self.target), before)
 
     def test_first_introduction_and_repeat_keep_live_shared_socket_and_project_rules(self):
         # macOS Unix sockets have a short pathname limit, so use the POSIX /tmp

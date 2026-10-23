@@ -1,6 +1,6 @@
 # ZERO 首次引入：新项目与既有项目
 
-更新：2026-10-23；适用：ZERO v2.1.1，macOS/Linux。
+更新：2026-10-23；适用：ZERO v2.1.2，macOS/Linux。
 
 ZERO 是项目初始化与改造模板。把文件复制过去只是准备阶段；Agent 还要核实项目事实、适配现有规范并建立可用检索。项目日常只维护 `.ai` 原始资料。
 
@@ -68,7 +68,8 @@ Codex 首次连接后重连/重启，以加载新 MCP；项目需按客户端正
 - 只维护 `.ai` 原始资料与 L0 配置源；工具、生成配置、模型和索引在 `L5#Knowledge/.generated/` 自动重建，Git 忽略生成物。
 - QMD 源集合明确忽略 `L0#Execution/backups/**` 和 `**/.generated/**`，`L0#Execution/evidence/` 原始证据仍可检索。适配器检测模型、集合或忽略策略漂移后恢复生成配置；策略调整写入 L0 源配置逻辑。
 - CodeGraph 根 `.codegraph` 为自动入口；共享 daemon 支持多个对话，用户目录进程登记与临时 socket 为自动运行元数据。路径预检只允许当前用户拥有的指定 `.generated/codegraph/daemon.sock` Unix socket，不能泛化为允许任意特殊文件或软链。
-- QMD 普通读取不刷新全库；MCP 启动后台补齐，Agent 修改源资料后自动执行 `retrieval-indexes.sh refresh` 并处理失败。CodeGraph 活动会话监听源码。
+- QMD 普通读取不刷新全库；MCP 启动后台检查是否需要补齐。Agent 批量完成源资料修改后在收尾执行一次 `retrieval-indexes.sh refresh` 并处理失败，只读任务和源资料未变不主动刷新。CodeGraph 活动会话监听源码。
+- 已知位置直接读范围，未知主题先小结果 lex，关系问题先小范围 CodeGraph；复用当前对话仍可见的未变证据。完整的预算和降级规则见检索适配规范，首次项目事实审计仍须完成。
 - 模板下载目录不承担项目运行依赖；完成引入后，采用项目无需另外维护 ZERO 下载副本。
 
 ## 给 AI 的首次引入指令

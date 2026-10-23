@@ -28,7 +28,7 @@ ONBOARDING_INDEX = AI / "L2#Index/zero-onboarding.md"
 STATE = CONFIGS / "zero-bootstrap-state.json"
 CODEX_SOURCE = CONFIGS / "zero-codex.toml"
 CODEX_LINK = Path(".codex/config.toml")
-VERSION = "2.1.1"
+VERSION = "2.1.2"
 
 
 class BootstrapError(Exception):
@@ -86,6 +86,7 @@ def template_files(source):
         "L0#Execution/hooks/retrieval-refresh-on-complete.json",
         "L0#Execution/workflows/local/retrieval-indexes.sh",
         "L0#Execution/workflows/local/retrieval-lock.py",
+        "L0#Execution/workflows/local/retrieval-state.py",
         "L0#Execution/workflows/local/zero-bootstrap.py",
         "L0#Execution/workflows/local/zero-bootstrap.sh",
         "L0#Execution/configs/retrieval-toolchain/package.json",
@@ -168,7 +169,10 @@ def agent_block(spec):
 - Read `{FACTS.as_posix()}` and the project's existing guide first, then `{GUIDE.as_posix()}` and `.ai/L2#Index/toc.md`.
 - Project facts and existing project boundaries govern adoption. Read `{ONBOARDING_INDEX.as_posix()}` and reconcile template standards through `{spec.as_posix()}/00.spec-03.tasks.md`; the first introduction remains pending until the Agent completes that audit.
 - Maintain source knowledge only in `.ai`. QMD retrieves its Markdown; CodeGraph derives relations from the project's source code. Verify retrieved claims against their owning sources.
-- After changing `.ai` source Markdown, automatically run `bash .ai/L0#Execution/workflows/local/retrieval-indexes.sh refresh` from the project root before completing the task; handle failures or report unavailable retrieval.
+- With an exact path/symbol, read the relevant range directly. Unknown document topics start with a scoped QMD lex query (normally 3 results, rerank disabled); code relationships start with a narrow CodeGraph query (normally maxFiles 3). Use vector/expanded search only when needed.
+- Reuse current unchanged excerpts still visible in this conversation and treat returned current source as already read. Fetch only missing or stale ranges; normally read 40-80 lines around a document hit and print selected paths/lines/excerpts rather than whole tool objects. Required initial context, audits and complete-file logic reviews still apply.
+- If retrieval is unavailable, make at most one targeted retry, then use scoped rg and range reads. Keep the project's owning-source, host and data-boundary verification requirements.
+- Batch all `.ai` source Markdown edits and automatically run `bash .ai/L0#Execution/workflows/local/retrieval-indexes.sh refresh` once from the project root at task completion. Read-only tasks and unchanged sources do not proactively refresh; handle failures and reserve explicit repair for a diagnosed stale/broken index.
 - Inspect legacy documentation and conventions during onboarding. Business code, API names and database schemas require separately reviewed semantic migrations; bootstrap creates no such migration.
 """
 
@@ -315,7 +319,7 @@ def plan(source, root, client):
     operations, preserved = [], []
     spec = onboarding_spec(root)
     check_runtime_paths(root)
-    essential = {LOCAL / name for name in ("retrieval-indexes.sh", "retrieval-lock.py", "zero-bootstrap.py", "zero-bootstrap.sh")}
+    essential = {LOCAL / name for name in ("retrieval-indexes.sh", "retrieval-lock.py", "retrieval-state.py", "zero-bootstrap.py", "zero-bootstrap.sh")}
     essential.update({CONFIGS / "retrieval-toolchain/package.json", CONFIGS / "retrieval-toolchain/package-lock.json"})
     for origin, relative in template_files(source):
         check_parents(root, relative)

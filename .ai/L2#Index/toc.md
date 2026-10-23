@@ -1,7 +1,7 @@
 # ZERO L2#规范索引 (Index)
 
 > **定位**：ZERO 框架的规范文档集合
-> **版本**：v2.1.1（六层架构 + 检索适配器）
+> **版本**：v2.1.2（六层架构 + 检索适配器）
 > **适用范围**：任意技术栈的 Web 项目
 
 ---
@@ -64,11 +64,13 @@ ZERO 是以文件夹路径为唯一主体的命名规范框架（路径为王）
 
 - **检索与关联适配** - [10.ai-memory-04.retrieval-adapters.md](../L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md)
   - 单一维护源、权威性与读取
+  - 已知位置定向读取、小结果 lex/CodeGraph、复用当前证据与有限降级
   - `.ai` 内的存储与映射
   - 备份/生成物排除、原始 evidence 保留与生成配置策略恢复
   - 共享 daemon 的同用户指定 socket、运行路径与锁保护
   - MCP 启动、Agent 收尾、CodeGraph watcher；Codex hook 信任边界
   - 完整初始化、MCP/IDE 边界、项目适配与运行验收
+  - [查询预算与复用](../L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md#查询预算与复用)：批量收尾刷新与同类任务验证
   - [v2.1 迁移指南](../L3%23Standards/references/migration-guide-v2-1.md)：旧 L5 归位、引用保留和逐项目接入
 
 #### 工作流与集成

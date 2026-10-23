@@ -6,13 +6,13 @@
 set -euo pipefail
 
 usage() {
-    printf 'Usage: bash %s <setup|init|refresh|status|qmd-mcp|codegraph-mcp|qmd [args...]>\n' "$0" >&2
+    printf 'Usage: bash %s <setup|init|refresh|refresh-force|status|qmd-mcp|codegraph-mcp|qmd [args...]>\n' "$0" >&2
 }
 [[ $# -ge 1 ]] || { usage; exit 2; }
 action="$1"
 shift
 case "$action" in
-    setup|refresh|init|status|qmd-mcp|codegraph-mcp|tools-prepare-without-lock|qmd-init-without-lock|qmd-prepare|qmd-refresh-without-lock|codegraph-prepare-without-lock) [[ $# -eq 0 ]] || { usage; exit 2; } ;;
+    setup|refresh|refresh-force|init|status|qmd-mcp|codegraph-mcp|tools-prepare-without-lock|qmd-init-without-lock|qmd-prepare|qmd-refresh-without-lock|qmd-force-without-lock|codegraph-prepare-without-lock|codegraph-force-without-lock) [[ $# -eq 0 ]] || { usage; exit 2; } ;;
     qmd)
         [[ $# -ge 1 ]] || { usage; exit 2; }
         case "$1" in
@@ -35,6 +35,7 @@ project_root="$(pwd -P)"
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 script_path="$script_dir/$(basename -- "${BASH_SOURCE[0]}")"
 lock_helper="$script_dir/retrieval-lock.py"
+state_helper="$script_dir/retrieval-state.py"
 runtime="$project_root/.ai/L5#Knowledge/.generated"
 qmd_config="$runtime/qmd/config"
 qmd_database="$runtime/cache/qmd/zero.sqlite"
@@ -205,6 +206,7 @@ setup_tools() {
 }
 
 qmd_command() { qmd --index zero "$@"; }
+retrieval_state() { python3 "$state_helper" "$1" "$project_root" "$script_path" "${2:-}"; }
 
 write_qmd_config() {
     # JSON is valid YAML. Generate the complete owned config so persisted model
@@ -259,6 +261,7 @@ qmd_locked() {
 prepare_qmd_without_lock() {
     qmd_ready && return 0
     mkdir -p "$qmd_config" || return 1
+    rm -f "$runtime/qmd/refresh-success.json" || return 1
     # Existing vectors from another/unknown model need dimension-safe rebuilding.
     if [[ -s "$qmd_database" && ( ! -s "$qmd_config/source-model" || "$(cat "$qmd_config/source-model")" != "$QMD_EMBED_MODEL" ) ]]; then
         touch "$qmd_config/reembed-required" || return 1
@@ -280,15 +283,36 @@ prepare_qmd() {
 }
 
 refresh_qmd_without_lock() {
+    local force="${1:-}" before after attempt
     require_cli qmd || return 1
     prepare_qmd_without_lock || return 1
-    qmd_command update || return 1
-    if [[ -f "$qmd_config/reembed-required" ]]; then
-        qmd_command embed --timeout 0 -f || return 1
-        rm -f "$qmd_config/reembed-required"
-    else
-        qmd_command embed --timeout 0
+    # Recheck after taking the lock: a waiting caller reuses the completed work.
+    if [[ -z "$force" && ! -f "$qmd_config/reembed-required" ]] && retrieval_state qmd-reusable; then
+        printf 'QMD source and complete index unchanged; reusing successful refresh.\n' >&2
+        return 0
     fi
+    rm -f "$runtime/qmd/refresh-success.json" || return 1
+    for attempt in 1 2 3; do
+        before="$(retrieval_state qmd-fingerprint)" || return 1
+        qmd_command update || return 1
+        if [[ -n "$force" || -f "$qmd_config/reembed-required" ]]; then
+            qmd_command embed --timeout 0 -f || return 1
+            rm -f "$qmd_config/reembed-required" || return 1
+        else
+            qmd_command embed --timeout 0 || return 1
+        fi
+        after="$(retrieval_state qmd-fingerprint)" || return 1
+        if [[ "$before" == "$after" ]]; then
+            if retrieval_state qmd-record "$before"; then return 0; fi
+            printf 'QMD returned without complete current document/vector coverage; refresh remains pending.\n' >&2
+            return 1
+        fi
+        printf 'QMD sources changed during refresh; checking the newer snapshot (%s/3).\n' "$attempt" >&2
+        # The initial forced rebuild is already complete; subsequent passes are incremental.
+        force=''
+    done
+    printf 'QMD sources are still changing; no successful refresh checkpoint recorded.\n' >&2
+    return 1
 }
 
 refresh_qmd() { qmd_locked qmd-refresh-without-lock; }
@@ -364,10 +388,11 @@ prepare_codegraph() {
     require_cli python3 || return 1
     # Keep this outside the store so a legacy root directory can still move.
     # Only init/sync hold this lock; the shared MCP daemon runs after release.
-    python3 "$lock_helper" --lock "$runtime/codegraph-prepare.lock" -- /bin/bash "$script_path" codegraph-prepare-without-lock
+    python3 "$lock_helper" --lock "$runtime/codegraph-prepare.lock" -- /bin/bash "$script_path" "${1:-codegraph-prepare-without-lock}"
 }
 
 prepare_codegraph_without_lock() {
+    local force="${1:-}" before after attempt adopt_result
     require_cli codegraph || return 1
     mkdir -p "$runtime" || return 1
     if [[ -L .codegraph ]]; then
@@ -386,11 +411,39 @@ prepare_codegraph_without_lock() {
     if [[ ! -L .codegraph ]]; then
         ln -s "$codegraph_alias" .codegraph || return 1
     fi
+    if [[ -z "$force" ]] && retrieval_state graph-reusable; then
+        printf 'CodeGraph shared watcher or unchanged offline sources ready; reusing prepared graph.\n' >&2
+        return 0
+    fi
+    if [[ -z "$force" ]]; then
+        if retrieval_state graph-adopt; then
+            printf 'CodeGraph healthy shared watcher adopted; skipping initialization/sync.\n' >&2
+            return 0
+        else
+            adopt_result=$?
+            # A moving source snapshot needs another task-level refresh, not
+            # an attempt to steal the healthy shared daemon's database lock.
+            [[ "$adopt_result" != 75 ]] || return 1
+        fi
+    fi
+    rm -f "$runtime/codegraph-prepared.json" || return 1
     # Official init checks the database schema, including interrupted/empty stores.
     # Prevent its automatic Git fallback hook installer on WSL / NO_WATCH hosts.
     # This override is scoped to init; the actual MCP keeps the host's watch policy.
-    env -u CODEGRAPH_NO_WATCH CODEGRAPH_FORCE_WATCH=1 codegraph init "$project_root" --yes || return 1
-    codegraph sync
+    for attempt in 1 2 3; do
+        before="$(retrieval_state graph-fingerprint)" || return 1
+        env -u CODEGRAPH_NO_WATCH CODEGRAPH_FORCE_WATCH=1 codegraph init "$project_root" --yes || return 1
+        codegraph sync || return 1
+        after="$(retrieval_state graph-fingerprint)" || return 1
+        if [[ "$before" == "$after" ]]; then
+            if retrieval_state graph-record "$before"; then return 0; fi
+            printf 'CodeGraph database/version is not ready; no prepared checkpoint recorded.\n' >&2
+            return 1
+        fi
+        printf 'CodeGraph sources changed during sync; checking the newer snapshot (%s/3).\n' "$attempt" >&2
+    done
+    printf 'CodeGraph sources are still changing; no prepared checkpoint recorded.\n' >&2
+    return 1
 }
 
 show_status() {
@@ -426,18 +479,26 @@ case "$action" in
     qmd-prepare) prepare_qmd_without_lock ;;
     qmd-init-without-lock) init_qmd_without_lock ;;
     qmd-refresh-without-lock) refresh_qmd_without_lock ;;
+    qmd-force-without-lock) refresh_qmd_without_lock force ;;
     codegraph-prepare-without-lock) prepare_codegraph_without_lock ;;
+    codegraph-force-without-lock) prepare_codegraph_without_lock force ;;
     status) show_status ;;
     init)
         result=0
         qmd_locked qmd-init-without-lock || result=1
-        prepare_codegraph || result=1
+        prepare_codegraph codegraph-force-without-lock || result=1
         exit "$result"
         ;;
     refresh)
         result=0
         refresh_qmd || result=1
         prepare_codegraph || result=1
+        exit "$result"
+        ;;
+    refresh-force)
+        result=0
+        qmd_locked qmd-force-without-lock || result=1
+        prepare_codegraph codegraph-force-without-lock || result=1
         exit "$result"
         ;;
     qmd)

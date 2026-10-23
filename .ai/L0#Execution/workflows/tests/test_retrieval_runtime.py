@@ -70,7 +70,7 @@ print('Installation diagnostics must stay off MCP stdout')
 '''
 
 FAKE_CLI = r'''#!/usr/bin/env python3
-import fcntl, json, os, pathlib, sys, time
+import fcntl, hashlib, json, os, pathlib, sqlite3, sys, time
 name = pathlib.Path(sys.argv[0]).name
 args = sys.argv[1:]
 project = pathlib.Path.cwd()
@@ -99,7 +99,26 @@ if name == 'qmd':
     cache = pathlib.Path(os.environ['XDG_CACHE_HOME']) / 'qmd'
     if command == 'update':
         cache.mkdir(parents=True, exist_ok=True)
-        (cache / 'zero.sqlite').write_text('fixture text index')
+        database = cache / 'zero.sqlite'
+        if database.exists() and database.read_bytes()[:16] != b'SQLite format 3\0':
+            database.unlink()
+        with sqlite3.connect(database) as db:
+            db.executescript("""CREATE TABLE IF NOT EXISTS documents(collection TEXT, path TEXT, hash TEXT, active INTEGER);
+                CREATE TABLE IF NOT EXISTS content_vectors(hash TEXT, seq INTEGER, model TEXT, embed_fingerprint TEXT, total_chunks INTEGER);""")
+            db.execute('DELETE FROM documents')
+            ai = project / '.ai'
+            paths = []
+            for layer in ('L0#Execution', 'L1#Overview', 'L2#Index', 'L3#Standards', 'L4#Changelog'):
+                paths.extend((ai / layer).rglob('*.md'))
+            paths.append(ai / 'L5#Knowledge/README.md')
+            for path in paths:
+                relative = path.relative_to(ai)
+                if (not path.is_file() or path.is_symlink() or any(part.startswith('.') for part in relative.parts)
+                        or relative.parts[:2] == ('L0#Execution', 'backups')):
+                    continue
+                text = path.read_bytes().decode('utf-8', errors='replace')
+                if text.strip():
+                    db.execute('INSERT INTO documents VALUES(?,?,?,1)', ('zero-ai', relative.as_posix(), hashlib.sha256(text.encode()).hexdigest()))
     elif command == 'pull':
         if os.environ.get('FIXTURE_FAIL_PULL'):
             sys.exit(41)
@@ -119,6 +138,13 @@ if name == 'qmd':
             time.sleep(0.02)
         if os.environ.get('FIXTURE_FAIL_EMBED'):
             sys.exit(43)
+        with sqlite3.connect(cache / 'zero.sqlite') as db:
+            if '-f' in args:
+                db.execute('DELETE FROM content_vectors')
+            if not os.environ.get('FIXTURE_PARTIAL_EMBED'):
+                for (digest,) in db.execute('SELECT DISTINCT hash FROM documents WHERE active=1').fetchall():
+                    db.execute('DELETE FROM content_vectors WHERE hash=?', (digest,))
+                    db.execute('INSERT INTO content_vectors VALUES(?,0,?,?,1)', (digest, os.environ['QMD_EMBED_MODEL'], '3f4dfd'))
         record(['embed-finished'])
     if command == 'mcp':
         print(json.dumps({'jsonrpc': '2.0', 'fixture': 'qmd'}))
@@ -130,7 +156,17 @@ else:
     if command == 'init':
         store = project / os.environ['CODEGRAPH_DIR']
         store.mkdir(parents=True, exist_ok=True)
-        (store / 'codegraph.db').write_text('fixture code graph')
+        with sqlite3.connect(store / 'codegraph.db') as db:
+            db.executescript("""CREATE TABLE IF NOT EXISTS files(id INTEGER);
+                CREATE TABLE IF NOT EXISTS nodes(id INTEGER);
+                CREATE TABLE IF NOT EXISTS schema_versions(version INTEGER);
+                CREATE TABLE IF NOT EXISTS project_metadata(key TEXT, value TEXT);""")
+            db.execute('DELETE FROM schema_versions')
+            db.execute('INSERT INTO schema_versions VALUES(11)')
+            db.execute('DELETE FROM project_metadata')
+            db.executemany('INSERT INTO project_metadata VALUES(?,?)', [('index_state','complete'), ('indexed_with_version','1.6.2')])
+    if command == 'sync' and os.environ.get('FIXTURE_FAIL_SYNC'):
+        sys.exit(47)
     if command == 'serve':
         print(json.dumps({'jsonrpc': '2.0', 'fixture': 'codegraph'}))
     else:
@@ -221,6 +257,118 @@ class RetrievalRuntimeTests(unittest.TestCase):
             self.assert_success(self.run_adapter(action))
         self.assertEqual(self.count("npm", "ci"), 1)
         self.assertEqual(self.count("qmd", "pull"), 1)
+
+    def test_unchanged_refresh_reuses_complete_qmd_and_offline_graph(self):
+        self.assert_success(self.run_adapter("refresh"))
+        updates = self.count("qmd", "update")
+        for _ in range(2):
+            result = self.run_adapter("refresh")
+            self.assert_success(result)
+            self.assertIn("reusing successful refresh", result.stderr)
+        self.assertEqual(self.count("qmd", "update"), updates)
+        self.assertEqual(self.count("qmd", "embed"), 1)
+        self.assertEqual(self.count("codegraph", "sync"), 1)
+
+    def test_document_edit_add_delete_each_refresh_and_ignored_backups_do_not(self):
+        self.assert_success(self.run_adapter("refresh"))
+        source = self.project / ".ai/L3#Standards/source.md"
+        source.write_text("# Changed source\n")
+        self.assert_success(self.run_adapter("refresh"))
+        added = self.project / ".ai/L0#Execution/evidence/current.md"
+        added.parent.mkdir(parents=True, exist_ok=True)
+        added.write_text("# Current original evidence\n")
+        self.assert_success(self.run_adapter("refresh"))
+        added.unlink()
+        self.assert_success(self.run_adapter("refresh"))
+        backup = self.project / ".ai/L0#Execution/backups/old.md"
+        backup.parent.mkdir(parents=True)
+        backup.write_text("# Ignored backup\n")
+        self.assert_success(self.run_adapter("refresh"))
+        self.assertEqual(self.count("qmd", "embed"), 4)
+        self.assertEqual(self.count("codegraph", "sync"), 1)
+
+    def test_failed_refresh_invalidates_success_and_retries_same_source(self):
+        self.assert_success(self.run_adapter("refresh"))
+        (self.project / ".ai/L3#Standards/source.md").write_text("# New revision\n")
+        self.assertNotEqual(self.run_adapter("refresh", FIXTURE_FAIL_EMBED="1").returncode, 0)
+        marker = self.project / GENERATED / "qmd/refresh-success.json"
+        self.assertFalse(marker.exists())
+        self.assert_success(self.run_adapter("refresh"))
+        self.assertEqual(self.count("qmd", "embed"), 3)
+        self.assertTrue(marker.is_file())
+
+    def test_zero_exit_with_incomplete_vectors_does_not_record_success(self):
+        result = self.run_adapter("refresh", FIXTURE_PARTIAL_EMBED="1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("complete current document/vector coverage", result.stderr)
+        self.assertFalse((self.project / GENERATED / "qmd/refresh-success.json").exists())
+        self.assert_success(self.run_adapter("refresh"))
+
+    def test_queued_concurrent_refresh_rechecks_success_inside_lock(self):
+        self.assert_success(self.run_adapter("refresh"))
+        (self.project / ".ai/L3#Standards/source.md").write_text("# Next revision\n")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+            jobs = [pool.submit(self.run_adapter, "refresh") for _ in range(3)]
+            for job in jobs:
+                self.assert_success(job.result())
+        self.assertEqual(self.count("qmd", "embed"), 2)
+        self.assertEqual(self.count("codegraph", "sync"), 1)
+
+    def test_source_changed_during_embed_is_included_before_success(self):
+        gate = self.project / ".ai/embedding-gate"
+        gate.touch()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            job = pool.submit(self.run_adapter, "refresh", FIXTURE_EMBED_GATE=str(gate))
+            try:
+                self.wait_until(lambda: self.count("qmd", "embed") == 1)
+                (self.project / ".ai/L3#Standards/source.md").write_text("# Changed while embedding\n")
+            finally:
+                gate.unlink(missing_ok=True)
+            self.assert_success(job.result())
+        self.assertEqual(self.count("qmd", "embed"), 2)
+        self.assert_success(self.run_adapter("refresh"))
+        self.assertEqual(self.count("qmd", "embed"), 2)
+
+    def test_refresh_force_rebuilds_vectors_and_graph_even_if_unchanged(self):
+        self.assert_success(self.run_adapter("refresh"))
+        self.assert_success(self.run_adapter("refresh-force"))
+        embeds = [event["args"] for event in self.events()
+                  if event["cli"] == "qmd" and event["args"][0] == "embed"]
+        self.assertEqual(len(embeds), 2)
+        self.assertIn("-f", embeds[-1])
+        self.assertEqual(self.count("codegraph", "sync"), 2)
+
+    def test_offline_graph_detects_code_edit_add_delete(self):
+        source = self.project / "main.ts"
+        source.write_text("export const current = 1;\n")
+        self.assert_success(self.run_adapter("refresh"))
+        source.write_text("export const current = 2;\n")
+        self.assert_success(self.run_adapter("refresh"))
+        added = self.project / "added.ts"
+        added.write_text("export const added = true;\n")
+        self.assert_success(self.run_adapter("refresh"))
+        source.unlink()
+        self.assert_success(self.run_adapter("refresh"))
+        self.assertEqual(self.count("codegraph", "sync"), 4)
+        self.assertEqual(self.count("qmd", "embed"), 1)
+
+    def test_missing_graph_database_and_schema_drift_require_preparation(self):
+        self.assert_success(self.run_adapter("refresh"))
+        database = self.project / GENERATED / "codegraph/codegraph.db"
+        database.unlink()
+        self.assert_success(self.run_adapter("codegraph-mcp"))
+        import sqlite3
+        with sqlite3.connect(database) as connection:
+            connection.execute("DROP TABLE nodes")
+        self.assert_success(self.run_adapter("refresh"))
+        self.assertEqual(self.count("codegraph", "sync"), 3)
+
+    def test_failed_graph_sync_is_not_reused_and_next_refresh_recovers(self):
+        self.assertNotEqual(self.run_adapter("refresh", FIXTURE_FAIL_SYNC="1").returncode, 0)
+        self.assertFalse((self.project / GENERATED / "codegraph-prepared.json").exists())
+        self.assert_success(self.run_adapter("refresh"))
+        self.assertEqual(self.count("codegraph", "sync"), 2)
+        self.assertEqual(self.count("qmd", "embed"), 1)
 
     def test_repeated_init_verifies_own_model_hashes_and_skips_network_pull(self):
         self.assert_success(self.run_adapter("init"))
@@ -338,7 +486,7 @@ class RetrievalRuntimeTests(unittest.TestCase):
             self.assert_success(self.run_adapter("refresh"))
         embeds = [event["args"] for event in self.events() if event["cli"] == "qmd" and event["args"][0] == "embed"]
         self.assertIn("-f", embeds[0])
-        self.assertNotIn("-f", embeds[1])
+        self.assertEqual(len(embeds), 1)
         self.assertFalse((config / "reembed-required").exists())
         self.assertEqual(json.loads((config / "zero.yml").read_text())["models"]["embed"], EMBED_MODEL)
 
@@ -428,6 +576,88 @@ class RetrievalRuntimeTests(unittest.TestCase):
         self.assertEqual(json.loads(result.stdout), {"jsonrpc": "2.0", "fixture": "codegraph"})
         self.assertEqual(path.lstat().st_ino, inode)
         self.assertEqual(connection.getsockname(), str(path))
+
+    def test_live_shared_daemon_skips_full_sync_and_offline_restart_catches_changes(self):
+        project = self.socket_project()
+        self.assert_success(self.run_adapter("refresh", project=project))
+        store = project / GENERATED / "codegraph"
+        path = store / "daemon.sock"
+        self.bind_fixture_socket(path)
+        (store / "daemon.pid").write_text(json.dumps({
+            "pid": os.getpid(), "version": "1.6.2", "socketPath": str(path),
+        }))
+        (store / "writer.pid").write_text(json.dumps({
+            "pid": os.getpid(), "mode": "daemon", "ready": True,
+        }))
+        (project / "main.ts").write_text("export const watched = true;\n")
+        result = self.run_adapter("codegraph-mcp", project=project)
+        self.assert_success(result)
+        self.assertEqual(self.count("codegraph", "sync", project), 1)
+        (store / "writer.pid").unlink()
+        self.assert_success(self.run_adapter("refresh", project=project))
+        self.assertEqual(self.count("codegraph", "sync", project), 2)
+
+    def shared_daemon_fixture(self, *, pid=None):
+        project = self.socket_project()
+        self.assert_success(self.run_adapter("refresh", project=project))
+        store = project / GENERATED / "codegraph"
+        self.bind_fixture_socket(store / "daemon.sock")
+        pid = os.getpid() if pid is None else pid
+        (store / "daemon.pid").write_text(json.dumps({
+            "pid": pid, "version": "1.6.2", "socketPath": str(store / "daemon.sock"),
+        }))
+        (store / "writer.pid").write_text(json.dumps({
+            "pid": pid, "mode": "daemon", "ready": True,
+        }))
+        (project / GENERATED / "codegraph-prepared.json").unlink()
+        return project, store
+
+    def test_upgrade_adopts_healthy_shared_daemon_without_checkpoint_or_sync(self):
+        project, store = self.shared_daemon_fixture()
+        result = self.run_adapter("codegraph-mcp", project=project)
+        self.assert_success(result)
+        self.assertIn("healthy shared watcher adopted", result.stderr)
+        self.assertEqual(self.count("codegraph", "init", project), 1)
+        self.assertEqual(self.count("codegraph", "sync", project), 1)
+        self.assertTrue((project / GENERATED / "codegraph-prepared.json").is_file())
+
+    def test_upgrade_adopts_healthy_daemon_after_implementation_checkpoint_drift(self):
+        project, store = self.shared_daemon_fixture()
+        marker = project / GENERATED / "codegraph-prepared.json"
+        marker.write_text(json.dumps({"implementation": {"adapter": "previous-version"}}))
+        result = self.run_adapter("refresh", project=project)
+        self.assert_success(result)
+        self.assertIn("healthy shared watcher adopted", result.stderr)
+        self.assertEqual(self.count("codegraph", "sync", project), 1)
+        self.assertNotEqual(json.loads(marker.read_text())["implementation"]["adapter"], "previous-version")
+
+    def test_upgrade_does_not_adopt_daemon_when_database_schema_is_incomplete(self):
+        project, store = self.shared_daemon_fixture()
+        import sqlite3
+        with sqlite3.connect(store / "codegraph.db") as connection:
+            connection.execute("DROP TABLE nodes")
+        result = self.run_adapter("codegraph-mcp", project=project)
+        self.assert_success(result)
+        self.assertNotIn("healthy shared watcher adopted", result.stderr)
+        self.assertEqual(self.count("codegraph", "init", project), 2)
+        self.assertEqual(self.count("codegraph", "sync", project), 2)
+
+    def test_upgrade_does_not_adopt_dead_shared_daemon_pid(self):
+        child = subprocess.Popen([sys.executable, "-c", "pass"])
+        child.wait(timeout=5)
+        project, store = self.shared_daemon_fixture(pid=child.pid)
+        result = self.run_adapter("codegraph-mcp", project=project)
+        self.assert_success(result)
+        self.assertNotIn("healthy shared watcher adopted", result.stderr)
+        self.assertEqual(self.count("codegraph", "init", project), 2)
+        self.assertEqual(self.count("codegraph", "sync", project), 2)
+
+    def test_explicit_force_does_not_adopt_or_skip_live_daemon_sync(self):
+        project, store = self.shared_daemon_fixture()
+        result = self.run_adapter("refresh-force", project=project)
+        self.assert_success(result)
+        self.assertNotIn("healthy shared watcher adopted", result.stderr)
+        self.assertEqual(self.count("codegraph", "sync", project), 2)
 
     def test_socket_outside_exact_codegraph_daemon_path_is_rejected(self):
         project = self.socket_project()

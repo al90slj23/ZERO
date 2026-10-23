@@ -1,6 +1,6 @@
 # ZERO 项目入口
 
-> 版本：v2.1.1；更新：2026-10-23。
+> 版本：v2.1.2；更新：2026-10-23。
 > ZERO 是供新项目及既有项目采用的开发规范与 AI 知识工作流模板。
 
 ## 首次引入
@@ -47,12 +47,14 @@ bash .ai/L0#Execution/workflows/local/zero-bootstrap.sh --target "$PWD"
 
 ## 检索与自动维护
 
-- QMD 查找 `.ai` Markdown，CodeGraph 探索源码符号、调用和影响面。已知小范围路径可直接阅读；返回结果须核实来源及版本。
+- 已知路径/符号直接定向读相关范围；未知文档主题先 QMD 小范围 `lex`（通常 3 条、关闭 rerank），不够再按需要用 vec/自动扩展。源码调用、依赖与影响面先小范围 CodeGraph（通常 `maxFiles: 3`）。
+- 工具已返回的当前源码视为已读；复用当前对话仍可见的未变片段，只补缺失或过期范围。QMD `get` 通常取命中前后 40–80 行；限制结果及打印片段，不把整个工具对象和正文重复输出。首次必读 L1、完整逻辑审查和审计仍按任务要求读完整内容。
+- 检索不可用最多一次有针对性的重试，然后在所属目录用 `rg` 和范围读取；检索结果仍须核实来源、版本与项目事实，不能用工具排名代替证据。
 - 工具、生成配置、模型、索引位于 `.ai/L5#Knowledge/.generated/`，由 L0 适配器重建。根 `.codegraph` 是自动入口软链。
 - QMD 集合排除 `L0#Execution/backups/**` 和 `**/.generated/**`，保留 `L0#Execution/evidence/` 原始证据；生成配置的模型、集合与忽略策略漂移由适配器恢复，不手改派生配置。
 - CodeGraph 默认共享 daemon，支持多个 AI 对话；用户目录进程登记和临时 socket 是自动元数据。预检仅放行当前用户拥有的 `.generated/codegraph/daemon.sock` Unix socket，其他异常路径仍拒绝。
 - QMD 普通读取不刷新全库；MCP 启动后台补齐。CodeGraph 活动 MCP 监听源码，离线变化在下次启动补齐。
-- Agent 修改 `.ai` 源 Markdown 后，任务结束前自动运行 `bash .ai/L0#Execution/workflows/local/retrieval-indexes.sh refresh`。缺工具时按 L0 锁文件安装，失败由 Agent 处理或说明当前可用状态，不交给用户例行维护。
+- Agent 批量完成 `.ai` 源 Markdown 修改后，任务收尾只运行一次 `bash .ai/L0#Execution/workflows/local/retrieval-indexes.sh refresh`；只读任务、源资料未变不主动刷新。失败由 Agent 处理或说明可用状态，诊断为索引异常时才用显式修复入口。
 - 当前自动触发就是 MCP 启动、Agent 收尾和 CodeGraph 源码 watcher；本版未安装原生 Codex Stop hook。Kiro `askAgent` 模板不能当作 Codex hook，新增原生 hook 另按客户端信任机制处理。
 - Codex 首次连接后需重连/重启加载工具，并按客户端机制信任项目；文件存在不代表 MCP 已连接。
 

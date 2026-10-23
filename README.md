@@ -1,19 +1,21 @@
 # ZERO - PathKing
 
 > **定位**：以文件夹路径为唯一主体的命名规范框架（路径为王）
-> **版本**：v2.1.1（六层架构 + 检索适配器）
+> **版本**：v2.1.2（六层架构 + 检索适配器）
 > **更新日期**：2026-10-23
 > **适用场景**：任意技术栈的 Web 项目
 
 ---
 
-## v2.1.1：只维护 `.ai`，自动生成检索能力
+## v2.1.2：只维护 `.ai`，按需检索与更新
 
 `.ai` 是知识主体；QMD 从文档生成检索索引，CodeGraph 从源码生成关系图。L5 统一定位为“知识检索与关联”。原始配置保存在 L0，生成配置、数据库和模型缓存保存在 `.ai/L5#Knowledge/.generated/`，由适配器自动构建与刷新；CodeGraph 根入口只是指向该目录的软链。
 
 客户端通过 `.ai/L0#Execution/workflows/local/retrieval-indexes.sh qmd-mcp` 和 `codegraph-mcp` 启动。自动更新来自 QMD MCP 启动时后台补齐、Agent 修改源文档后的收尾刷新，以及 CodeGraph 活动会话的源码 watcher；本版没有安装原生 Codex Stop hook。接入步骤见 [检索适配规范](.ai/L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md)，旧 L5 内容按 [v2.1 迁移指南](.ai/L3%23Standards/references/migration-guide-v2-1.md) 归位并保留引用。
 
 v2.1.1 保持六层物理结构、模型和工具版本，补齐运行边界：QMD 排除备份与生成物、保留原始 evidence；生成配置发生策略漂移时由适配器恢复；共享 daemon 的指定本地 socket 仅允许当前用户拥有的 Unix socket。
+
+v2.1.2 收敛日常检索：已知路径直接读相关范围；未知主题先小结果 lex，代码关系用小范围 CodeGraph；复用当前对话已读且未变的证据，按需要再扩大。源文档修改集中到任务收尾刷新一次，只读任务不主动刷新。实际收益通过同类任务的正确性、返回内容量和刷新工作核对，不承诺固定节省比例。
 
 ## 首次引入 ZERO
 
