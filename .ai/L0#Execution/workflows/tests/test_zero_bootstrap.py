@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import socket
 import stat
 import subprocess
 import sys
@@ -44,6 +45,7 @@ def inventory(root, exclude_backups=False):
         mode = stat.S_IMODE(path.lstat().st_mode)
         if path.is_symlink(): value = ("symlink", mode, os.readlink(path))
         elif path.is_file(): value = ("file", mode, path.read_bytes())
+        elif path.is_socket(): value = ("socket", mode)
         else: value = ("directory", mode)
         result[relative.as_posix()] = value
     return result
@@ -93,6 +95,7 @@ class BootstrapTests(unittest.TestCase):
             path.write_text("excluded source material")
         source_before = inventory(self.source)
         state = self.prepared()
+        self.assertEqual(state["zero_version"], "2.1.1")
         self.assertFalse(state["runtime_ready"])
         self.assertTrue(state["project_adaptation_pending"])
         self.assertIsNone(state["backup"])
@@ -262,6 +265,103 @@ class BootstrapTests(unittest.TestCase):
         (bins / "codegraph").symlink_to("../@colbymchenry/codegraph/bin/codegraph")
         self.prepared()
         self.assertTrue((bins / "qmd").is_symlink())
+
+    def test_first_introduction_and_repeat_keep_live_shared_socket_and_project_rules(self):
+        # macOS Unix sockets have a short pathname limit, so use the POSIX /tmp
+        # root rather than the longer per-user macOS temporary directory.
+        with tempfile.TemporaryDirectory(prefix="zb-", dir="/tmp") as temporary:
+            target = Path(temporary).resolve() / "p"
+            target.mkdir()
+            old_guide = target / ".ai/L1#Overview/guide.md"
+            old_guide.parent.mkdir(parents=True)
+            old_guide.write_text("Project-specific rules must survive\n")
+            (target / "AGENTS.md").write_text("Original root instructions\n")
+            config = target / CONFIG
+            config.parent.mkdir()
+            config.write_text('model = "existing-model"\n[mcp_servers.other]\ncommand = "keep-this"\n')
+            prepared = self.prepared(target=target)
+            self.assertFalse(prepared["runtime_ready"])
+            self.assertTrue(prepared["project_adaptation_pending"])
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as listener:
+                address = target / ".ai/L5#Knowledge/.generated/codegraph/daemon.sock"
+                def initialize(*args, **kwargs):
+                    if not address.exists():
+                        address.parent.mkdir(parents=True)
+                        listener.bind(str(address))
+                        listener.listen(1)
+                        (target / ".codegraph").symlink_to(".ai/L5#Knowledge/.generated/codegraph")
+                    return subprocess.CompletedProcess([], 0)
+                subject = load_module(self.source / BOOTSTRAP)
+                output = io.StringIO()
+                with mock.patch.object(sys, "argv", ["bootstrap", "--target", str(target)]), \
+                        mock.patch.object(subject.subprocess, "run", side_effect=initialize), \
+                        contextlib.redirect_stdout(output):
+                    subject.main()
+                self.assertTrue(json.loads(output.getvalue())["runtime_ready"])
+                before = inventory(target)
+                socket_inode = address.stat().st_ino
+                repeated = self.prepared(target=target)
+                self.assertEqual(repeated["changed_files"], 0)
+                self.assertIsNone(repeated["backup"])
+                self.assertTrue(repeated["runtime_ready"])
+                self.assertTrue(repeated["project_adaptation_pending"])
+                output = io.StringIO()
+                with mock.patch.object(sys, "argv", ["bootstrap", "--target", str(target)]), \
+                        mock.patch.object(subject.subprocess, "run", side_effect=initialize) as initialization, \
+                        contextlib.redirect_stdout(output):
+                    subject.main()
+                initialization.assert_called_once()
+                self.assertEqual(json.loads(output.getvalue())["changed_files"], 0)
+                self.assertEqual(inventory(target), before)
+                self.assertEqual(address.stat().st_ino, socket_inode)
+                self.assertGreaterEqual(listener.fileno(), 0)
+                self.assertEqual(old_guide.read_text(), "Project-specific rules must survive\n")
+                self.assertTrue((target / "AGENTS.md").read_text().startswith("Original root instructions\n"))
+                merged = tomllib.loads(config.read_text())
+                self.assertEqual(merged["model"], "existing-model")
+                self.assertEqual(merged["mcp_servers"]["other"]["command"], "keep-this")
+
+    def test_other_runtime_socket_locations_and_socket_alias_are_rejected(self):
+        for kind in ("cache", "legacy", "alias"):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory(prefix="zb-", dir="/tmp") as temporary:
+                target = Path(temporary).resolve() / "p"
+                target.mkdir()
+                runtime = target / ".ai/L5#Knowledge/.generated"
+                address = (runtime / "cache/foreign.sock" if kind == "cache" else
+                           target / ".codegraph/daemon.sock" if kind == "legacy" else
+                           Path(temporary).resolve() / "outside.sock")
+                address.parent.mkdir(parents=True, exist_ok=True)
+                with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as listener:
+                    listener.bind(str(address))
+                    listener.listen(1)
+                    if kind == "alias":
+                        alias = runtime / "codegraph/daemon.sock"
+                        alias.parent.mkdir(parents=True)
+                        alias.symlink_to(address)
+                    before = inventory(target)
+                    inode = address.stat().st_ino
+                    result = self.run_cli("--prepare-only", target=target)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("Unsafe runtime", result.stderr)
+                    self.assertEqual(inventory(target), before)
+                    self.assertEqual(address.stat().st_ino, inode)
+
+    def test_shared_socket_from_another_uid_is_rejected_before_changes(self):
+        with tempfile.TemporaryDirectory(prefix="zb-", dir="/tmp") as temporary:
+            target = Path(temporary).resolve() / "p"
+            address = target / ".ai/L5#Knowledge/.generated/codegraph/daemon.sock"
+            address.parent.mkdir(parents=True)
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as listener:
+                listener.bind(str(address))
+                before = inventory(target)
+                subject = load_module(self.source / BOOTSTRAP)
+                with mock.patch.object(sys, "argv", ["bootstrap", "--target", str(target)]), \
+                        mock.patch.object(subject.os, "getuid", return_value=os.getuid() + 1), \
+                        mock.patch.object(subject.subprocess, "run") as initialization, \
+                        self.assertRaises(subject.BootstrapError):
+                    subject.main()
+                initialization.assert_not_called()
+                self.assertEqual(inventory(target), before)
 
     def test_existing_graph_alias_backup_preserves_link_without_duplicate_store(self):
         store = ".ai/L5#Knowledge/.generated/codegraph/codegraph.db"

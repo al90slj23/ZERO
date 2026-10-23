@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -89,9 +90,12 @@ record(args)
 if name == 'qmd':
     config = json.loads((pathlib.Path(os.environ['QMD_CONFIG_DIR']) / 'zero.yml').read_text())
     assert config['models']['embed'] == os.environ['QMD_EMBED_MODEL']
+    assert config['models']['rerank'] == os.environ['QMD_RERANK_MODEL']
+    assert config['models']['generate'] == os.environ['QMD_GENERATE_MODEL']
     assert 'Qwen3-Embedding' in config['models']['embed']
     assert set(config['models']) == {'embed', 'generate', 'rerank'}
     assert config['collections']['zero-ai']['path'] == str(project / '.ai')
+    assert config['collections']['zero-ai']['ignore'] == ['L0#Execution/backups/**', '**/.generated/**']
     cache = pathlib.Path(os.environ['XDG_CACHE_HOME']) / 'qmd'
     if command == 'update':
         cache.mkdir(parents=True, exist_ok=True)
@@ -245,6 +249,40 @@ class RetrievalRuntimeTests(unittest.TestCase):
         self.assert_success(self.run_adapter("init"))
         self.assertEqual(self.count("qmd", "pull"), 2)
 
+    def test_existing_collection_without_exclusions_is_updated_without_forced_embed(self):
+        self.assert_success(self.run_adapter("refresh"))
+        config = self.project / GENERATED / "qmd/config/zero.yml"
+        previous = json.loads(config.read_text())
+        previous["collections"]["zero-ai"].pop("ignore")
+        config.write_text(json.dumps(previous))
+        self.assert_success(self.run_adapter("refresh"))
+        current = json.loads(config.read_text())["collections"]["zero-ai"]
+        self.assertEqual(current["ignore"], ["L0#Execution/backups/**", "**/.generated/**"])
+        self.assertNotIn("L0#Execution/evidence/**", current["ignore"])
+        embeds = [event["args"] for event in self.events() if event["cli"] == "qmd" and event["args"][0] == "embed"]
+        self.assertTrue(all("-f" not in args for args in embeds))
+
+    def test_existing_model_config_drift_is_repaired_without_forcing_same_model_vectors(self):
+        self.assert_success(self.run_adapter("refresh"))
+        config = self.project / GENERATED / "qmd/config/zero.yml"
+        previous = json.loads(config.read_text())
+        previous["models"]["generate"] = "hf:fixture/old-generator/old.gguf"
+        config.write_text(json.dumps(previous))
+        self.assert_success(self.run_adapter("refresh"))
+        current = json.loads(config.read_text())
+        self.assertNotEqual(current["models"]["generate"], previous["models"]["generate"])
+        embeds = [event["args"] for event in self.events() if event["cli"] == "qmd" and event["args"][0] == "embed"]
+        self.assertTrue(all("-f" not in args for args in embeds))
+
+    def test_old_yaml_policy_is_normalized_without_forcing_verified_model_vectors(self):
+        self.assert_success(self.run_adapter("refresh"))
+        config = self.project / GENERATED / "qmd/config/zero.yml"
+        config.write_text("models:\n  embed: " + EMBED_MODEL + "\ncollections: {}\n")
+        self.assert_success(self.run_adapter("refresh"))
+        self.assertEqual(json.loads(config.read_text())["models"]["embed"], EMBED_MODEL)
+        embeds = [event["args"] for event in self.events() if event["cli"] == "qmd" and event["args"][0] == "embed"]
+        self.assertTrue(all("-f" not in args for args in embeds))
+
     def test_simultaneous_initializations_install_once_and_serialize_writers(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
             jobs = [pool.submit(self.run_adapter, "init", FIXTURE_INSTALL_DELAY="0.15") for _ in range(3)]
@@ -364,6 +402,44 @@ class RetrievalRuntimeTests(unittest.TestCase):
         self.assert_success(self.run_adapter("refresh"))
         self.assertEqual(self.count("npm", "ci"), 1)
         self.assertEqual(os.readlink(self.project / ".codegraph"), ".ai/L5#Knowledge/.generated/codegraph")
+
+    def socket_project(self):
+        # macOS sockaddr_un paths are short; default temporary roots can exceed it.
+        temporary = tempfile.TemporaryDirectory(prefix="zr-", dir="/tmp")
+        self.addCleanup(temporary.cleanup)
+        return self.make_project(str(Path(temporary.name).resolve() / "p"))
+
+    def bind_fixture_socket(self, path):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.addCleanup(connection.close)
+        connection.bind(str(path))
+        return connection
+
+    def test_owned_codegraph_daemon_socket_survives_refresh_and_mcp_startup(self):
+        project = self.socket_project()
+        self.assert_success(self.run_adapter("refresh", project=project))
+        path = project / GENERATED / "codegraph/daemon.sock"
+        connection = self.bind_fixture_socket(path)
+        inode = path.lstat().st_ino
+        self.assert_success(self.run_adapter("refresh", project=project))
+        result = self.run_adapter("codegraph-mcp", project=project)
+        self.assert_success(result)
+        self.assertEqual(json.loads(result.stdout), {"jsonrpc": "2.0", "fixture": "codegraph"})
+        self.assertEqual(path.lstat().st_ino, inode)
+        self.assertEqual(connection.getsockname(), str(path))
+
+    def test_socket_outside_exact_codegraph_daemon_path_is_rejected(self):
+        project = self.socket_project()
+        path = project / GENERATED / "qmd/unexpected.sock"
+        connection = self.bind_fixture_socket(path)
+        inode = path.lstat().st_ino
+        result = self.run_adapter("refresh", project=project)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("preflight refused", result.stderr)
+        self.assertEqual(self.events(project), [])
+        self.assertEqual(path.lstat().st_ino, inode)
+        self.assertEqual(connection.getsockname(), str(path))
 
 
 if __name__ == "__main__":

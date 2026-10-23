@@ -73,6 +73,7 @@ preflight_owned_paths() {
     python3 - "$project_root" <<'PY'
 import os
 import pathlib
+import stat
 import sys
 
 root = pathlib.Path(sys.argv[1])
@@ -122,6 +123,13 @@ def scan(store):
                         pass
                 refuse(path)
             if path.exists() and not (path.is_dir() or path.is_file()):
+                # CodeGraph's shared daemon owns this one local IPC socket.
+                # Preserve a running daemon; other special files stay rejected.
+                metadata = path.lstat()
+                if (path == runtime / 'codegraph/daemon.sock'
+                        and stat.S_ISSOCK(metadata.st_mode)
+                        and metadata.st_uid == os.getuid()):
+                    continue
                 refuse(path)
 
 try:
@@ -201,7 +209,7 @@ qmd_command() { qmd --index zero "$@"; }
 write_qmd_config() {
     # JSON is valid YAML. Generate the complete owned config so persisted model
     # defaults can never override the Chinese embedding model on later queries.
-    python3 - "$qmd_config/zero.yml.tmp" "$project_root/.ai" "$QMD_EMBED_MODEL" "$QMD_RERANK_MODEL" "$QMD_GENERATE_MODEL" <<'PY'
+    python3 - "$qmd_config/zero.yml.tmp" "$project_root/.ai" "$QMD_EMBED_MODEL" "$QMD_RERANK_MODEL" "$QMD_GENERATE_MODEL" "${1:-write}" <<'PY'
 import json
 import pathlib
 import sys
@@ -215,17 +223,30 @@ config = {
         'zero-ai': {
             'path': sys.argv[2],
             'pattern': 'L0#Execution/**/*.md,L1#Overview/**/*.md,L2#Index/**/*.md,L3#Standards/**/*.md,L4#Changelog/**/*.md,L5#Knowledge/README.md',
+            'ignore': ['L0#Execution/backups/**', '**/.generated/**'],
         },
     },
 }
-pathlib.Path(sys.argv[1]).write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\n')
+temporary = pathlib.Path(sys.argv[1])
+if sys.argv[6] == 'verify':
+    source = temporary.with_name('zero.yml')
+    if not source.exists():
+        source = source.with_name('zero.yaml')
+    try:
+        sys.exit(0 if json.loads(source.read_text()) == config else 1)
+    except (OSError, ValueError):
+        # Older generated YAML is normalized without changing its model marker.
+        sys.exit(1)
+else:
+    temporary.write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\n')
 PY
 }
 
 qmd_ready() {
     [[ -s "$qmd_config/source-root" && "$(cat "$qmd_config/source-root")" == "$project_root" ]] &&
         [[ -s "$qmd_config/zero.yml" || -s "$qmd_config/zero.yaml" ]] &&
-        [[ -s "$qmd_database" && -s "$qmd_config/source-model" && "$(cat "$qmd_config/source-model")" == "$QMD_EMBED_MODEL" ]]
+        [[ -s "$qmd_database" && -s "$qmd_config/source-model" && "$(cat "$qmd_config/source-model")" == "$QMD_EMBED_MODEL" ]] &&
+        write_qmd_config verify
 }
 
 qmd_locked() {

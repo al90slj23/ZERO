@@ -1,6 +1,6 @@
 # ZERO 首次引入：新项目与既有项目
 
-更新：2026-10-23；适用：ZERO v2.1，macOS/Linux。
+更新：2026-10-23；适用：ZERO v2.1.1，macOS/Linux。
 
 ZERO 是项目初始化与改造模板。把文件复制过去只是准备阶段；Agent 还要核实项目事实、适配现有规范并建立可用检索。项目日常只维护 `.ai` 原始资料。
 
@@ -59,14 +59,15 @@ bash .ai/L0#Execution/workflows/local/retrieval-indexes.sh status
 
 完整模式自动安装 `.ai` 内锁定的 QMD 2.8.3 / CodeGraph 1.6.2，下载模型，建立 QMD 文本/中文语义索引及源码关系图。可以从原模板入口指定同一 `--target` 重复运行；现有资料保留，工具无需重复安装，已完成索引增量更新。
 
-验收须包含：QMD 命中本项目源文档、中文语义查询可回溯来源、CodeGraph 命中项目符号、MCP 可连接、待嵌入数量为 0。空项目尚无源码符号时明确记录，不虚构图谱命中。
+验收须包含：QMD 命中本项目源文档、中文语义查询可回溯来源、备份/生成物不进入文档集合且原始 evidence 保留、CodeGraph 命中项目符号、MCP 可连接、待嵌入数量为 0。多对话使用时核验两个 CodeGraph 客户端可共享服务，一方退出不影响另一方。空项目尚无源码符号时明确记录，不虚构图谱命中。
 
-Codex 首次连接后重连/重启，以加载新 MCP；项目需按客户端正常机制信任。没有 hook 的客户端由项目 AGENTS 收尾规则驱动 Agent 执行，不宣称存在后台文件监听。
+Codex 首次连接后重连/重启，以加载新 MCP；项目需按客户端正常机制信任。本版不安装原生 Codex Stop hook：收尾由项目 AGENTS/L1 规则驱动 Agent 执行，另有 MCP 启动刷新和 CodeGraph 源码 watcher。Kiro `askAgent` 模板不是 Codex 可执行 hook；未来添加非 managed 原生 Codex hook，需对具体定义另行信任，不能以复制模板代替激活。
 
 ## 日常与数据位置
 
 - 只维护 `.ai` 原始资料与 L0 配置源；工具、生成配置、模型和索引在 `L5#Knowledge/.generated/` 自动重建，Git 忽略生成物。
-- CodeGraph 根 `.codegraph` 为自动入口；共享 daemon 支持多个对话，用户目录进程登记与临时 socket 为自动运行元数据。
+- QMD 源集合明确忽略 `L0#Execution/backups/**` 和 `**/.generated/**`，`L0#Execution/evidence/` 原始证据仍可检索。适配器检测模型、集合或忽略策略漂移后恢复生成配置；策略调整写入 L0 源配置逻辑。
+- CodeGraph 根 `.codegraph` 为自动入口；共享 daemon 支持多个对话，用户目录进程登记与临时 socket 为自动运行元数据。路径预检只允许当前用户拥有的指定 `.generated/codegraph/daemon.sock` Unix socket，不能泛化为允许任意特殊文件或软链。
 - QMD 普通读取不刷新全库；MCP 启动后台补齐，Agent 修改源资料后自动执行 `retrieval-indexes.sh refresh` 并处理失败。CodeGraph 活动会话监听源码。
 - 模板下载目录不承担项目运行依赖；完成引入后，采用项目无需另外维护 ZERO 下载副本。
 

@@ -28,7 +28,7 @@ ONBOARDING_INDEX = AI / "L2#Index/zero-onboarding.md"
 STATE = CONFIGS / "zero-bootstrap-state.json"
 CODEX_SOURCE = CONFIGS / "zero-codex.toml"
 CODEX_LINK = Path(".codex/config.toml")
-VERSION = "2.1"
+VERSION = "2.1.1"
 
 
 class BootstrapError(Exception):
@@ -303,6 +303,12 @@ def check_runtime_paths(root):
                             path.resolve().is_relative_to(npm) and path.resolve().is_file()):
                         continue
                     raise BootstrapError(f"Unsafe runtime alias: {path}")
+                metadata = path.lstat()
+                if not (stat.S_ISDIR(metadata.st_mode) or stat.S_ISREG(metadata.st_mode)):
+                    if (path == root / runtime / "codegraph/daemon.sock" and
+                            stat.S_ISSOCK(metadata.st_mode) and metadata.st_uid == os.getuid()):
+                        continue
+                    raise BootstrapError(f"Unsafe runtime special file: {path}")
 
 
 def plan(source, root, client):
