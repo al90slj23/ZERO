@@ -26,6 +26,12 @@
 
 ## 推荐 Hooks
 
+### 检索索引自动补齐
+
+`retrieval-refresh-on-complete.json` 在任务收尾提示 Agent 自动补齐本次 `.ai` 变更对应的检索索引；刷新本身不再触发源文档写入。CLI 缺失时适配器按 L0 锁定工具链自动安装；失败则由 Agent 处理并说明可用状态。此 hook 使用 Kiro 的 `askAgent` 格式，其他客户端按自身事件机制接入；无 hook 的客户端由 L1 收尾规则驱动 Agent 执行。
+
+适配器和配置源都在 `.ai`，生成数据也在 L5；用户只维护源资料。详见 [检索适配规范](../../L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md)。
+
 ### 1. 规范同步检查（强烈推荐）⭐
 
 **文件**：`standards-sync-on-complete.json`

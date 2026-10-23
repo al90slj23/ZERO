@@ -6,6 +6,8 @@
 
 ---
 
+当前 L5 定义与命名已随 v2.1 调整，见 [检索与关联适配规范](../standards/10.ai-memory-04.retrieval-adapters.md)。七层示例中的 L6 名称保留历史含义。
+
 ## 概述
 
 本文档总结了 AiLinkDog 项目从七层架构迁移到六层架构的实践经验，包括设计决策、实施步骤和最佳实践。
@@ -34,7 +36,7 @@ L1 - 项目概览
 L2 - 规范索引
 L3 - 完整规范（合并了七层的 L3+L4）
 L4 - 操作日志
-L5 - 知识图谱
+L5 - 知识检索与关联（v2.1 当前定义）
 ```
 
 **合并理由**：
@@ -54,7 +56,7 @@ L5 - 知识图谱
 | L2 | 规范索引 | Index | `.ai/L2#Index/` | L2#规范索引 (Index) |
 | L3 | 完整规范 | Standards | `.ai/L3#Standards/` | L3#完整规范 (Standards) |
 | L4 | 操作日志 | Changelog | `.ai/L4#Changelog/` | L4#操作日志 (Changelog) |
-| L5 | 知识图谱 | Knowledge | `.ai/L5#Knowledge/` | L5#知识图谱 (Knowledge) |
+| L5 | 知识检索与关联 | Knowledge | `.ai/L5#Knowledge/` | L5#知识检索与关联 (Knowledge) |
 
 详见：[10.ai-memory-03.six-layer-naming.md](../standards/10.ai-memory-03.six-layer-naming.md)
 
@@ -183,8 +185,8 @@ ls -la .kiro/steering/
 
 **示例**：
 ```markdown
-详见 [L2#规范索引 (Index)](../../L2#Index/toc.md)
-参考 [L3#完整规范 (Standards)](../../L3#Standards/standards/)
+详见 [L2#规范索引 (Index)](../../L2%23Index/toc.md)
+参考 [L3#完整规范 (Standards)](../../L3%23Standards/standards/)
 ```
 
 ### 3. 日常沟通可以简称

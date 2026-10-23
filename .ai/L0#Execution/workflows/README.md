@@ -149,6 +149,14 @@ echo "部署完成！"
 
 ## 常见工作流
 
+### 知识检索自动适配
+
+新项目与既有项目先使用 `local/zero-bootstrap.sh --target <项目> --prepare-only`，由 Agent 完成首次适配后执行完整模式。它保留并备份目标资料、合并 `.ai` 模板与 Codex 连接，然后调用检索 `init`。参见 [首次引入指南](../../L3%23Standards/references/zero-first-use.md)。
+
+`local/retrieval-indexes.sh` 是 QMD / CodeGraph 的启动和收尾入口：首次自动构建配置和索引，之后自动补齐变化。客户端用 `qmd-mcp`、`codegraph-mcp` 启动，Agent 在知识源变更后执行 `refresh`，`status` 用于检查。所有真实数据放在 `.ai/L5#Knowledge/.generated/`；根 `.codegraph` 仅为自动生成的软链。
+
+此脚本从采用项目的根目录运行，依赖 Bash、Python 3（macOS/Linux 文件锁）、Node.js 22+ 与 npm，自动按 L0 toolchain 锁定版本安装本地 CLI。`setup` 仅安装工具，`init` 预拉模型并完成初次索引。QMD MCP 启动后台补齐，普通读取使用现有索引，收尾 `refresh` 等待互斥刷新完成。接入详见 [检索适配规范](../../L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md)。
+
 | 工作流 | 触发条件 | 用途 |
 |--------|---------|------|
 | CI 测试 | push / PR | 运行单元测试、集成测试 |

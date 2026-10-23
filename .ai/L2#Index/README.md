@@ -1,7 +1,7 @@
 # L2#规范索引 (Index)
 
-> **版本**：v2.0.0（六层架构）
-> **最后更新**：2026-04-26
+> **版本**：v2.1.0（六层架构 + 检索适配器）
+> **最后更新**：2026-10-23
 
 ---
 
@@ -28,7 +28,7 @@ L2#规范索引 (Index) 是六层 AI 记忆体系的索引层，提供当前规�
 - **L2 = 分类索引 + 文件标题大纲**
 - 通过标题大纲，AI 可以精准定位需要的内容
 - 避免盲目加载多个 L3#完整规范 (Standards) 文件
-- 减少 token 消耗 40-50%
+- 按需读取相关内容，实际上下文与耗时按任务测量
 
 **使用方式**：
 - AI 通过标题大纲判断文件内容
@@ -51,7 +51,7 @@ L2#规范索引 (Index) 是六层 AI 记忆体系的索引层，提供当前规�
 通过提供每个文件的标题大纲（h1/h2/h3），AI 可以：
 - ✅ 快速判断文件是否包含所需内容
 - ✅ 精准定位，只加载 1-2 个相关文件
-- ✅ 减少 token 消耗 40-50%
+- ✅ 按需读取，减少无关内容
 - ✅ 提高响应速度
 
 ---
@@ -102,10 +102,12 @@ grep -c "L3#Standards" ".ai/L2#Index/toc.md"
 
 ## 参考资料
 
-- [L1 项目指南](../L1#Overview/guide.md)
-- [L3 完整规范](../L3#Standards/standards/)
-- [AI 记忆体系架构](../L3#Standards/standards/10.ai-memory-01.architecture.md)
+- [检索与关联适配规范](../L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md)
+
+- [L1 项目指南](../L1%23Overview/guide.md)
+- [L3 完整规范](../L3%23Standards/standards/)
+- [AI 记忆体系架构](../L3%23Standards/standards/10.ai-memory-01.architecture.md)
 
 ---
 
-**最后更新**：2026-04-26
+**最后更新**：2026-10-23

@@ -1,7 +1,7 @@
 # ZERO L2#规范索引 (Index)
 
 > **定位**：ZERO 框架的规范文档集合
-> **版本**：v2.0.0（六层架构）
+> **版本**：v2.1.0（六层架构 + 检索适配器）
 > **适用范围**：任意技术栈的 Web 项目
 
 ---
@@ -31,6 +31,10 @@ ZERO 是以文件夹路径为唯一主体的命名规范框架（路径为王）
 
 #### 工具与开发流程
 
+- **首次引入 ZERO** - [新项目与既有项目初始化](../L3%23Standards/references/zero-first-use.md)
+  - 备份、保留原规则、项目事实/代码约定适配
+  - 本地工具/模型/索引初始化、一次性 Codex 连接与验收
+
 - **Hooks 与规范同步** - `09.tool-04.hooks.md`
   - Hook 配置规范（支持 hook 的 IDE）
   - 规范同步冲突检测流程（开发方法论级，适用所有环境）
@@ -46,8 +50,8 @@ ZERO 是以文件夹路径为唯一主体的命名规范框架（路径为王）
   - gogogo.sh ai：AI 体系状态、Kiro specs 同步、L4#操作日志 (Changelog) 日志
 
 - **AI 记忆体系架构** - `10.ai-memory-01.architecture.md`
-  - 六层架构（L0#工作执行 (Execution) - L5#知识图谱 (Knowledge)）
-  - 文档蒸馏与映射
+  - 六层架构（L0#工作执行 (Execution) - L5#知识检索与关联 (Knowledge)）
+  - 文档蒸馏、映射和 L5 派生查询层
 
 - **六层架构命名规范** - `10.ai-memory-02.naming.md`
   - 六层架构文件命名规范
@@ -57,6 +61,12 @@ ZERO 是以文件夹路径为唯一主体的命名规范框架（路径为王）
   - 中英文命名对照表
   - 文件夹和文档引用格式
   - 从旧七层迁移到六层的步骤
+
+- **检索与关联适配** - [10.ai-memory-04.retrieval-adapters.md](../L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md)
+  - 单一维护源、权威性与读取
+  - `.ai` 内的存储与映射
+  - 自动构建与更新、MCP/IDE 边界、验收与成本
+  - [v2.1 迁移指南](../L3%23Standards/references/migration-guide-v2-1.md)：旧 L5 归位、引用保留和逐项目接入
 
 #### 工作流与集成
 
@@ -106,10 +116,10 @@ API路径：/api/admin/users/config/levels
 
 ### 📚 了解更多
 
-- [L1 项目指南](../L1#Overview/guide.md)
-- [AI 记忆体系架构](../L3#Standards/standards/10.ai-memory-01.architecture.md)
-- [六层架构命名规范](../L3#Standards/standards/10.ai-memory-03.six-layer-naming.md)
+- [L1 项目指南](../L1%23Overview/guide.md)
+- [AI 记忆体系架构](../L3%23Standards/standards/10.ai-memory-01.architecture.md)
+- [六层架构命名规范](../L3%23Standards/standards/10.ai-memory-03.six-layer-naming.md)
 
 ---
 
-**最后更新**：2026-04-26
+**最后更新**：2026-10-23

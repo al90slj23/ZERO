@@ -1,9 +1,37 @@
 # ZERO - PathKing
 
 > **定位**：以文件夹路径为唯一主体的命名规范框架（路径为王）
-> **版本**：v2.0.0（六层架构）
-> **更新日期**：2026-04-26
+> **版本**：v2.1.0（六层架构 + 检索适配器）
+> **更新日期**：2026-10-23
 > **适用场景**：任意技术栈的 Web 项目
+
+---
+
+## v2.1：只维护 `.ai`，自动生成检索能力
+
+`.ai` 是知识主体；QMD 从文档生成检索索引，CodeGraph 从源码生成关系图。L5 统一定位为“知识检索与关联”。原始配置保存在 L0，生成配置、数据库和模型缓存保存在 `.ai/L5#Knowledge/.generated/`，由适配器自动构建与刷新；CodeGraph 根入口只是指向该目录的软链。
+
+客户端通过 `.ai/L0#Execution/workflows/local/retrieval-indexes.sh qmd-mcp` 和 `codegraph-mcp` 启动；Agent 在任务收尾自动补齐索引。接入步骤见 [检索适配规范](.ai/L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md)，旧 L5 内容按 [v2.1 迁移指南](.ai/L3%23Standards/references/migration-guide-v2-1.md) 归位并保留引用。
+
+## 首次引入 ZERO
+
+新项目和以前未采用 ZERO 的项目都从同一入口开始。环境：macOS/Linux、Bash、Python 3.11+；完整初始化还需 Node.js 22+ 与 npm。
+
+假设 ZERO 下载在目标项目的 `ZERO/` 目录，Agent 先准备并保留原资料：
+
+```bash
+bash ZERO/.ai/L0#Execution/workflows/local/zero-bootstrap.sh --target "$PWD" --prepare-only
+```
+
+随后按生成的首次适配清单核实项目事实、归位旧文档，处理命名/架构/接口与数据约定的差异。完成适配后，从目标项目执行：
+
+```bash
+bash .ai/L0#Execution/workflows/local/zero-bootstrap.sh --target "$PWD"
+```
+
+此步会自动安装 `.ai` 内的锁定工具、下载模型、建立 QMD/CodeGraph 索引并配置 Codex 连接。以 ZERO 自身建立新项目时，第一条命令也用 `.ai/...` 路径。默认 `--client codex`，其他客户端可用 `--client none` 后按自身设置接入。
+
+现有 `.ai` 与将修改的入口/连接先备份；已有源资料不直接覆盖。脚本不替代业务代码适配，运行状态和项目改造状态分别验收。详细步骤与可复制的 AI 指令见 [首次引入指南](.ai/L3%23Standards/references/zero-first-use.md)。原有 `gogogo` 映射菜单不承担首次引入。
 
 ---
 
@@ -36,7 +64,7 @@ API路径：/api/admin/users/config/levels
 3. **行业通用 > 项目特定** - 使用行业公认术语，避免自创缩写
 4. **精准语义 > 模糊简称** - `processUserRegistration()` 而非 `process()`
 
-详见：[04.quality-00.naming-philosophy.md](.ai/L3#Standards/standards/04.quality-00.naming-philosophy.md)
+详见：[04.quality-00.naming-philosophy.md](.ai/L3%23Standards/standards/04.quality-00.naming-philosophy.md)
 
 ---
 
@@ -94,8 +122,8 @@ ZERO/
     ├── L4#Changelog/                   # 操作日志
     │   └── README.md                   # 工作日志说明
     │
-    └── L5#Knowledge/                   # 知识图谱（可选）
-        └── README.md                   # 知识图谱说明
+    └── L5#Knowledge/                   # 知识检索与关联（可选）
+        └── README.md                   # 检索与关联接入说明
 ```
 
 ---
@@ -146,22 +174,22 @@ ls -la .kiro/skills/my-skill/SKILL.md
 ```
 
 **详细说明**：
-- Hooks：查看 [.ai/L0#Execution/hooks/README.md](.ai/L0#Execution/hooks/README.md)
-- Skills：查看 [.ai/L0#Execution/skills/README.md](.ai/L0#Execution/skills/README.md)
-- Specs：查看 [.ai/L0#Execution/specs/README.md](.ai/L0#Execution/specs/README.md)
-- Workflows：查看 [.ai/L0#Execution/workflows/README.md](.ai/L0#Execution/workflows/README.md)
+- Hooks：查看 [.ai/L0#Execution/hooks/README.md](.ai/L0%23Execution/hooks/README.md)
+- Skills：查看 [.ai/L0#Execution/skills/README.md](.ai/L0%23Execution/skills/README.md)
+- Specs：查看 [.ai/L0#Execution/specs/README.md](.ai/L0%23Execution/specs/README.md)
+- Workflows：查看 [.ai/L0#Execution/workflows/README.md](.ai/L0%23Execution/workflows/README.md)
 
 #### 2. 规范文档查阅顺序
 
 ```
-L1#项目概览 (Overview) → L2#规范索引 (Index) → L3#完整规范 (Standards) → L5#知识图谱 (Knowledge) → L4#操作日志 (Changelog)
+L0 当前任务 / L1 项目概览 → L2 导航 → L3 当前规范；L4 按需追溯，L5 按需检索来源
 ```
 
-- **L1#项目概览 (Overview)**：[.ai/L1#Overview/guide.md](.ai/L1#Overview/guide.md) - 项目概览和零容忍规则
-- **L2#规范索引 (Index)**：[.ai/L2#Index/toc.md](.ai/L2#Index/toc.md) - 按主题分类的索引
-- **L3#完整规范 (Standards)**：[.ai/L3#Standards/standards/](.ai/L3#Standards/standards/) - 当前唯一规范主版本
-- **L5#知识图谱 (Knowledge)**：[.ai/L5#Knowledge/](.ai/L5#Knowledge/) - 知识沉淀和语义关系
-- **L4#操作日志 (Changelog)**：[.ai/L4#Changelog/](.ai/L4#Changelog/) - 历史追溯
+- **L1#项目概览 (Overview)**：[.ai/L1#Overview/guide.md](.ai/L1%23Overview/guide.md) - 项目概览和零容忍规则
+- **L2#规范索引 (Index)**：[.ai/L2#Index/toc.md](.ai/L2%23Index/toc.md) - 按主题分类的索引
+- **L3#完整规范 (Standards)**：[.ai/L3#Standards/standards/](.ai/L3%23Standards/standards/) - 当前唯一规范主版本
+- **L5#知识检索与关联 (Knowledge)**：[.ai/L5#Knowledge/](.ai/L5%23Knowledge/) - 工具化文档检索与源码关系探索
+- **L4#操作日志 (Changelog)**：[.ai/L4#Changelog/](.ai/L4%23Changelog/) - 历史追溯
 
 #### 3. gogogo.sh 常用命令
 
@@ -235,7 +263,7 @@ php artisan view:fix        # 自动修复不一致
 - Redis 缓存 + 1 小时 TTL
 - 自动同步命令保持文件系统与数据库一致
 
-详见：[02.backend-04.db-manifest.md](.ai/L3#Standards/standards/02.backend-04.db-manifest.md)
+详见：[02.backend-04.db-manifest.md](.ai/L3%23Standards/standards/02.backend-04.db-manifest.md)
 
 ### 侧边栏菜单
 
@@ -253,11 +281,11 @@ php artisan view:fix        # 自动修复不一致
 
 **无硬编码默认值**：没有就是 null，前端根据 null 显示警告状态。
 
-详见：[05.biz-01.menu.md](.ai/L3#Standards/standards/05.biz-01.menu.md)
+详见：[05.biz-01.menu.md](.ai/L3%23Standards/standards/05.biz-01.menu.md)
 
 ### 迁移指南
 
-从旧版 `rules/` 目录结构迁移到新版 `.ai/` 六层架构，详见：[migration-guide-v2.md](.ai/L3#Standards/references/migration-guide-v2.md)
+从旧版 `rules/` 目录结构迁移到新版 `.ai/` 六层架构，详见：[migration-guide-v2.md](.ai/L3%23Standards/references/migration-guide-v2.md)
 
 ### 表命名
 
@@ -356,7 +384,7 @@ FeatureName.FileType.ext
 
 **函数/方法**：推荐 10-40 行，上限 80 行
 
-详见：[06.quality-01.size.md](.ai/L3#Standards/standards/06.quality-01.size.md)
+详见：[06.quality-01.size.md](.ai/L3%23Standards/standards/06.quality-01.size.md)
 
 ---
 
@@ -386,7 +414,7 @@ FeatureName.FileType.ext
 | 修复 | `fix/<问题描述>` |
 | 发布 | `release/<版本号>` |
 
-详见：[06.quality-02.git.md](.ai/L3#Standards/standards/06.quality-02.git.md)
+详见：[06.quality-02.git.md](.ai/L3%23Standards/standards/06.quality-02.git.md)
 
 ---
 
@@ -408,7 +436,7 @@ FeatureName.FileType.ext
 - 提供解决方案
 - 不暴露敏感信息
 
-详见：[06.quality-03.error.md](.ai/L3#Standards/standards/06.quality-03.error.md)
+详见：[06.quality-03.error.md](.ai/L3%23Standards/standards/06.quality-03.error.md)
 
 ---
 
@@ -430,7 +458,7 @@ FeatureName.FileType.ext
 - 修改代码 → 更新注释
 - 新增函数 → 更新【主要函数】
 
-详见：[06.quality-04.header.md](.ai/L3#Standards/standards/06.quality-04.header.md)
+详见：[06.quality-04.header.md](.ai/L3%23Standards/standards/06.quality-04.header.md)
 
 ---
 
@@ -466,7 +494,7 @@ gogogo.2.sh        # 选项 2: 检查状态
 ...
 ```
 
-详见：[09.tool-01.gogogo-sh.md](.ai/L3#Standards/standards/09.tool-01.gogogo-sh.md)
+详见：[09.tool-01.gogogo-sh.md](.ai/L3%23Standards/standards/09.tool-01.gogogo-sh.md)
 
 ---
 
@@ -480,7 +508,7 @@ gogogo.2.sh        # 选项 2: 检查状态
    - **源文件直接放在 L0 子目录**：`.ai/L0#Execution/hooks/*.json`、`.ai/L0#Execution/skills/{name}/`（不套 `kiro/` 等平台子目录）
    - **通过符号链接映射到各 IDE**：运行 `./gogogo.sh 8a` 或 `./gogogo.sh 8f`
    - **禁止直接修改映射目标**：`.kiro/hooks/`、`.kiro/skills/` 等是只读映射目标
-   - 详见：[.ai/L0#Execution/README.md](.ai/L0#Execution/README.md)
+   - 详见：[.ai/L0#Execution/README.md](.ai/L0%23Execution/README.md)
 6. **修改代码必须同步更新文件头注释**
 7. **Commit 必须符合格式规范**
 8. **规范变更必须执行冲突检测**（开发方法论级）
@@ -488,7 +516,7 @@ gogogo.2.sh        # 选项 2: 检查状态
    - 无 hook 能力的环境（Cursor、CLI）→ 手动执行
    - 四步检测：L3#完整规范 (Standards) 内部冲突 → L2#规范索引 (Index) 一致性 → L1#项目概览 (Overview) 宪法级
    - 逐步纯化历史文档，确保规范长期一致性
-   - 详见：[09.tool-04.hooks.md](.ai/L3#Standards/standards/09.tool-04.hooks.md)
+   - 详见：[09.tool-04.hooks.md](.ai/L3%23Standards/standards/09.tool-04.hooks.md)
 
 ---
 
@@ -504,4 +532,4 @@ const name = config?.shortName || folderName
 
 ---
 
-**最后更新**：2026-04-16
+**最后更新**：2026-10-23

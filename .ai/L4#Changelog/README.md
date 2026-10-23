@@ -33,9 +33,9 @@ ZERO 框架的完整演进记录。
 
 ### 📖 相关文档
 
-- [规范文档](../rules/README.md) - ZERO 规范
-- [迁移指南](../MIGRATION-GUIDE.md) - 迁移说明
+- [规范索引](../L2%23Index/toc.md) - ZERO 当前规范导航
+- [首次引入指南](../L3%23Standards/references/zero-first-use.md) - 新项目与既有项目接入
 
 ---
 
-**最后更新**：2026-04-12
+**最后更新**：2026-10-23

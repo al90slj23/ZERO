@@ -1,7 +1,7 @@
 # L1#项目概览 (Overview)
 
-> **版本**：v2.0.0（六层架构）
-> **最后更新**：2026-04-26
+> **版本**：v2.1.0（六层架构 + 检索适配器）
+> **最后更新**：2026-10-23
 
 ---
 
@@ -69,10 +69,12 @@ L1#项目概览 (Overview) 是六层 AI 记忆体系的入口层，提供项目�
 
 ## 参考资料
 
-- [L2 文档目录](../L2#Index/toc.md)
-- [AI 记忆体系架构](../L3#Standards/standards/10.ai-memory-01.architecture.md)
-- [六层架构命名规范](../L3#Standards/standards/10.ai-memory-03.six-layer-naming.md)
+- [检索与关联适配规范](../L3%23Standards/standards/10.ai-memory-04.retrieval-adapters.md)
+
+- [L2 文档目录](../L2%23Index/toc.md)
+- [AI 记忆体系架构](../L3%23Standards/standards/10.ai-memory-01.architecture.md)
+- [六层架构命名规范](../L3%23Standards/standards/10.ai-memory-03.six-layer-naming.md)
 
 ---
 
-**最后更新**：2026-04-26
+**最后更新**：2026-10-23
